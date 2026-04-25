@@ -6,15 +6,6 @@
     overlayMsg.textContent = 'loading base model…';
     loadBar.style.width = '20%';
 
-    overlayMsg.textContent = 'requesting microphone…';
-    try {
-      const s = await navigator.mediaDevices.getUserMedia({audio: true});
-      s.getTracks().forEach(t => t.stop());
-    } catch {
-      overlayMsg.textContent = 'microphone access denied — please allow and reload';
-      return;
-    }
-
     overlayMsg.textContent = 'loading base model…';
     base = speechCommands.create('BROWSER_FFT');
     await base.ensureModelLoaded();

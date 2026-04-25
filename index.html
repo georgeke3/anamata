@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kana</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="flip/flip.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic&family=Klee+One&family=Noto+Sans+JP&family=Noto+Serif+JP&family=Shippori+Mincho&family=Zen+Old+Mincho&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="overlay">
+  <span id="overlay-msg">loading…</span>
+  <div class="load-bar-wrap"><div class="load-bar" id="load-bar"></div></div>
+</div>
+
+<!-- ── HOME ───────────────────────────────────────────────────────────────── -->
+<section id="s-home" class="screen">
+  <div class="home-hdr">
+    <h2 id="home-title" class="mode-title" title="Switch to Flip">KANA</h2>
+    <div style="display:flex;gap:.3rem;align-items:center">
+      <button class="btn-gear" id="btn-history" title="Stats">◎</button>
+      <button class="btn-gear" id="btn-settings" title="Settings">⚙</button>
+    </div>
+  </div>
+  <div class="row-grid" id="row-grid"></div>
+  <div style="display:flex;gap:.75rem;justify-content:center">
+    <button class="btn go" id="btn-prac" disabled>practice</button>
+    <button class="btn"    id="btn-cal">calibrate</button>
+  </div>
+  <button class="btn" id="btn-manage" style="display:none;font-size:.7rem;color:#444;border-color:#1a1a1a">manage training</button>
+  <p class="hint" id="home-hint">select rows to calibrate</p>
+  <button class="btn" id="btn-reset-bg" style="font-size:.7rem;color:#222;border-color:#181818">reset silence</button>
+  <button class="btn" id="btn-set-default" style="font-size:.6rem;color:#1e1e1e;border-color:#161616">set as default</button>
+</section>
+
+<!-- ── FLIP HOME ──────────────────────────────────────────────────────────── -->
+<section id="s-flip-home" class="screen">
+  <div class="home-hdr">
+    <h2 id="flip-home-title" class="mode-title" title="Switch to Kana">FLIP</h2>
+    <div style="display:flex;gap:.4rem;align-items:center">
+      <button class="btn toggle-btn on" id="fl-set-hira" title="Hiragana">あ</button>
+      <button class="btn toggle-btn on" id="fl-set-kata" title="Katakana">ア</button>
+      <button class="btn-gear" id="btn-fl-history" title="Stats">◎</button>
+      <button class="btn-gear" id="btn-fl-settings" title="Settings">⚙</button>
+    </div>
+  </div>
+  <div class="row-grid" id="fl-row-grid"></div>
+  <button class="btn" id="fl-toggle-all" style="font-size:.75rem;color:#555;border-color:#1e1e1e">select all</button>
+  <button class="btn go" id="fl-start">start</button>
+  <button class="btn" id="btn-fl-set-default" style="font-size:.6rem;color:#1e1e1e;border-color:#161616">set as default</button>
+</section>
+
+<!-- ── FLIP SETTINGS ──────────────────────────────────────────────────────── -->
+<section id="s-flip-settings" class="screen">
+  <h2>FLIP</h2>
+  <div class="settings-list" style="width:100%">
+    <div class="setting-row">
+      <span class="setting-lbl">TIMEOUT</span>
+      <div class="setting-ctrl">
+        <input type="number" class="setting-num" id="fl-set-timer" min="1" max="10" step="0.5" value="5">
+        <span class="setting-unit">s</span>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-lbl">DAKUTEN</span>
+      <button class="btn toggle-btn off-state" id="fl-set-dakuten">OFF</button>
+    </div>
+    <div class="setting-row">
+      <span class="setting-lbl">COMBOS</span>
+      <button class="btn toggle-btn off-state" id="fl-set-combos">OFF</button>
+    </div>
+    <div class="setting-row">
+      <span class="setting-lbl">SELECTION</span>
+      <div class="fl-pick-btns">
+        <button class="btn fl-pick-btn" id="fl-pick-random">random</button>
+        <button class="btn fl-pick-btn on" id="fl-pick-session">session</button>
+        <button class="btn fl-pick-btn" id="fl-pick-lifetime">lifetime</button>
+      </div>
+    </div>
+  </div>
+  <div class="hist-section-lbl">fonts</div>
+  <div id="fl-font-grid"></div>
+  <button class="btn" id="btn-fl-settings-back" style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
+</section>
+
+<!-- ── FLIP ────────────────────────────────────────────────────────────────── -->
+<section id="s-flip" class="screen">
+  <span id="fl-count">#0</span>
+  <div id="fl-card">
+    <div id="fl-timer-wrap">
+      <svg class="fl-t-svg" viewBox="0 0 200 200">
+        <circle class="r-bg" cx="100" cy="100" r="88"/>
+        <circle class="r-arc" cx="100" cy="100" r="88" id="fl-arc"/>
+      </svg>
+      <div class="big" id="fl-kana">?</div>
+    </div>
+    <p id="fl-hint">↓ · space · click</p>
+    <div id="fl-answer">
+      <div id="fl-romaji"></div>
+      <div id="fl-altchar"></div>
+    </div>
+  </div>
+  <div id="fl-btns">
+    <button class="btn fl-btn-ok"  id="fl-correct">←  correct</button>
+    <button class="btn fl-btn-err" id="fl-wrong">wrong  →</button>
+  </div>
+  <div id="fl-bar">
+    <div id="fl-score-wrap">
+      <span id="fl-score">0 / 0</span>
+      <span id="fl-stats"></span>
+    </div>
+    <button class="btn" id="fl-end" style="font-size:.7rem;color:#222;border-color:#181818;padding:.3rem .8rem">end</button>
+  </div>
+</section>
+
+<!-- ── FLIP SUMMARY ───────────────────────────────────────────────────────── -->
+<section id="s-flip-sum" class="screen">
+  <h2>FLIP</h2>
+  <div id="fls-stats"></div>
+  <div id="fls-heat"></div>
+  <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+    <button class="btn go" id="btn-fl-again">again</button>
+    <button class="btn"    id="btn-fl-home">home</button>
+    <button class="btn"    id="btn-fls-history" style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">◎ stats</button>
+  </div>
+</section>
+
+<!-- ── MANAGE TRAINING ────────────────────────────────────────────────────── -->
+<section id="s-manage" class="screen">
+  <h2>MANAGE TRAINING</h2>
+  <div class="mng-grid" id="mng-grid"></div>
+  <p class="mng-notice" id="mng-notice" style="display:none"></p>
+  <div class="mng-actions">
+    <button class="btn go" id="btn-mng-retrain" disabled>retrain</button>
+    <button class="btn go" id="btn-mng-quicktest" disabled>quick test</button>
+  </div>
+  <button class="btn" id="btn-mng-silence" style="font-size:.7rem;color:#444;border-color:#1a1a1a" disabled>retrain silence</button>
+  <button class="btn" id="btn-mng-back" style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
+</section>
+
+<!-- ── SETTINGS ────────────────────────────────────────────────────────────── -->
+<section id="s-settings" class="screen">
+  <h2>SETTINGS</h2>
+  <div class="settings-list">
+    <div class="setting-row">
+      <span class="setting-lbl">TIMEOUT</span>
+      <div class="setting-ctrl">
+        <input type="number" class="setting-num" id="set-timer" min="0.5" max="8" step="0.5" value="3">
+        <span class="setting-unit">s</span>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-lbl">HIRAGANA</span>
+      <button class="btn toggle-btn on" id="set-hira">ON</button>
+    </div>
+    <div class="setting-row">
+      <span class="setting-lbl">KATAKANA</span>
+      <button class="btn toggle-btn on" id="set-kata">ON</button>
+    </div>
+  </div>
+  <button class="btn" id="btn-set-reset" style="font-size:.75rem;color:#333;border-color:#1a1a1a">reset defaults</button>
+  <button class="btn" id="btn-set-back" style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
+</section>
+
+<!-- ── CALIBRATE ──────────────────────────────────────────────────────────── -->
+<section id="s-cal" class="screen">
+  <h2 id="cal-title">CALIBRATE</h2>
+  <div class="big" id="cal-char" style="color:#e8e8e8">…</div>
+  <div class="sub"  id="cal-rom"> </div>
+  <div class="dots" id="cal-dots"></div>
+  <p class="cal-st"  id="cal-st">—</p>
+  <button class="btn" id="btn-cancel" style="font-size:.7rem;color:#222;border-color:#181818;margin-top:.5rem">cancel</button>
+</section>
+
+<!-- ── TRAINING ───────────────────────────────────────────────────────────── -->
+<section id="s-train" class="screen">
+  <h2>TRAINING</h2>
+  <div class="prog-wrap"><div class="prog-fill" id="t-fill"></div></div>
+  <p class="cal-st" id="t-st">—</p>
+</section>
+
+<!-- ── PRACTICE ──────────────────────────────────────────────────────────── -->
+<section id="s-prac" class="screen">
+  <div id="dbg"></div>
+  <div id="pr-tap">tap to start</div>
+  <div class="timer-wrap">
+    <svg class="t-svg" viewBox="0 0 200 200">
+      <circle class="r-bg"  cx="100" cy="100" r="88"/>
+      <circle class="r-arc" cx="100" cy="100" r="88" id="t-arc"/>
+    </svg>
+    <div class="big" id="pr-kana">?</div>
+  </div>
+  <div id="pr-fb"></div>
+  <div id="pr-bar">
+    <div class="pr-score-wrap">
+      <span id="pr-score">0 / 0</span>
+      <span id="pr-stats"></span>
+    </div>
+    <span id="pr-mic">●</span>
+    <button class="btn" id="btn-end" style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">end</button>
+  </div>
+</section>
+
+<!-- ── SUMMARY ────────────────────────────────────────────────────────────── -->
+<section id="s-summary" class="screen">
+  <h2>SUMMARY</h2>
+  <div id="sm-stats"></div>
+  <div id="sm-heat"></div>
+  <div id="sm-weakest"></div>
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:center">
+    <button class="btn go" id="btn-again">practice again</button>
+    <button class="btn"    id="btn-sm-home">home</button>
+  </div>
+</section>
+
+<!-- ── HISTORY ────────────────────────────────────────────────────────────── -->
+<section id="s-history" class="screen">
+  <h2>STATS</h2>
+  <div id="hist-mode-toggle">
+    <button class="btn hist-mode-btn" id="btn-hist-kana">KANA</button>
+    <button class="btn hist-mode-btn" id="btn-hist-flip">FLIP</button>
+  </div>
+  <div id="hist-lifetime"></div>
+  <div class="hist-section-lbl">recent sessions</div>
+  <div id="hist-sessions"></div>
+  <div class="hist-section-lbl">weakest kana</div>
+  <div id="hist-weakest"></div>
+  <button class="btn" id="btn-hist-back" style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands@0.5.4/dist/speech-commands.min.js"></script>
+<script src="js/app.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/db.js"></script>
+<script src="js/calibrate.js"></script>
+<script src="js/manage.js"></script>
+<script src="js/practice.js"></script>
+<script src="js/history.js"></script>
+<script src="js/init.js"></script>
+<script src="flip/flip.js"></script>
+</body>
+</html>

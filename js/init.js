@@ -47,7 +47,7 @@
     overlayEl.classList.add('off');
 
     const hash = location.hash.slice(1); // 'kana', 'flip', or ''
-    const defaultMode = await loadPref('default-mode', 'kana');
+    const defaultMode = await loadPref('default-mode', 'flip');
     updateDefaultBtns(defaultMode);
     const goFlip = hash === 'flip' || (hash !== 'kana' && defaultMode === 'flip');
     if (goFlip) enterFlipHome();

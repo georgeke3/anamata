@@ -2,17 +2,8 @@
 
 // ── HISTORY SCREEN ────────────────────────────────────────────────────────────
 
-let histMode   = 'kana';
-let histOrigin = 'kana';
-
-async function enterHistory(mode = 'kana') {
-  histMode   = mode;
-  histOrigin = mode;
+async function enterHistory() {
   showScreen('history');
-
-  // Update toggle button states
-  document.getElementById('btn-hist-kana').classList.toggle('hist-mode-active', mode === 'kana');
-  document.getElementById('btn-hist-flip').classList.toggle('hist-mode-active', mode === 'flip');
 
   document.getElementById('hist-lifetime').textContent = 'loading…';
   document.getElementById('hist-sessions').innerHTML   = '';
@@ -20,9 +11,8 @@ async function enterHistory(mode = 'kana') {
 
   const [allAttempts, allSessions] = await Promise.all([loadAllAttempts(), loadAllSessions()]);
 
-  // Filter by mode: kana attempts have no mode field (legacy) or mode === 'kana'
-  const attempts = allAttempts.filter(a => mode === 'flip' ? a.mode === 'flip' : a.mode !== 'flip');
-  const sessions = allSessions.filter(s => mode === 'flip' ? s.mode === 'flip' : s.mode !== 'flip');
+  const attempts = allAttempts.filter(a => a.mode === 'flip');
+  const sessions = allSessions.filter(s => s.mode === 'flip');
 
   renderLifetimeStats(attempts, sessions);
   renderRecentSessions(sessions, attempts);
@@ -79,7 +69,7 @@ function renderWeakestKana(attempts) {
   }
 
   const ranked = Object.entries(byRomaji)
-    .filter(([, st]) => st.tot >= 5)
+    .filter(([, st]) => st.tot >= 3)
     .sort((a, b) => (a[1].ok / a[1].tot) - (b[1].ok / b[1].tot))
     .slice(0, 8);
 
@@ -99,10 +89,4 @@ function renderWeakestKana(attempts) {
 }
 
 // ── WIRE UP ───────────────────────────────────────────────────────────────────
-document.getElementById('btn-hist-kana').addEventListener('click', () => enterHistory('kana'));
-document.getElementById('btn-hist-flip').addEventListener('click', () => enterHistory('flip'));
-
-document.getElementById('btn-hist-back').addEventListener('click', () => {
-  if (histOrigin === 'flip') enterFlipHome();
-  else { renderHome(); showScreen('home'); }
-});
+document.getElementById('btn-hist-back').addEventListener('click', () => enterFlipHome());

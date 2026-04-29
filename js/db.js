@@ -1,90 +1,6 @@
 'use strict';
 
-// ── BACKGROUND SILENCE ────────────────────────────────────────────────────────
-function bgDb() {
-  return new Promise((res, rej) => {
-    const req = indexedDB.open('kana-bg', 1);
-    req.onupgradeneeded = e => e.target.result.createObjectStore('bg');
-    req.onsuccess = e => res(e.target.result);
-    req.onerror   = e => rej(e.target.error);
-  });
-}
-
-async function saveBgExamples(buffer) {
-  const db = await bgDb();
-  return new Promise((res, rej) => {
-    const tx = db.transaction('bg', 'readwrite');
-    tx.objectStore('bg').put(buffer, 'data');
-    tx.oncomplete = res; tx.onerror = e => rej(e.target.error);
-  });
-}
-
-async function loadBgExamples() {
-  try {
-    const db = await bgDb();
-    return new Promise((res, rej) => {
-      const tx = db.transaction('bg', 'readonly');
-      const req = tx.objectStore('bg').get('data');
-      req.onsuccess = e => res(e.target.result || null);
-      req.onerror   = e => rej(e.target.error);
-    });
-  } catch { return null; }
-}
-
-// ── KANA EXAMPLES (per-phoneme, for targeted retrain) ─────────────────────────
-function examplesDb() {
-  return new Promise((res, rej) => {
-    const req = indexedDB.open('kana-examples', 1);
-    req.onupgradeneeded = e => e.target.result.createObjectStore('ex');
-    req.onsuccess = e => res(e.target.result);
-    req.onerror   = e => rej(e.target.error);
-  });
-}
-
-async function saveKanaExample(romaji, buffer) {
-  const db = await examplesDb();
-  return new Promise((res, rej) => {
-    const tx = db.transaction('ex', 'readwrite');
-    tx.objectStore('ex').put(buffer, romaji);
-    tx.oncomplete = res; tx.onerror = e => rej(e.target.error);
-  });
-}
-
-async function loadKanaExample(romaji) {
-  try {
-    const db = await examplesDb();
-    return new Promise((res, rej) => {
-      const tx = db.transaction('ex', 'readonly');
-      const req = tx.objectStore('ex').get(romaji);
-      req.onsuccess = e => res(e.target.result || null);
-      req.onerror   = e => rej(e.target.error);
-    });
-  } catch { return null; }
-}
-
-async function hasAnyKanaExamples() {
-  try {
-    const db = await examplesDb();
-    return new Promise((res, rej) => {
-      const tx  = db.transaction('ex', 'readonly');
-      const req = tx.objectStore('ex').count();
-      req.onsuccess = e => res(e.target.result > 0);
-      req.onerror   = e => rej(e.target.error);
-    });
-  } catch { return false; }
-}
-
-async function saveKanaExamplesFor(sounds) {
-  for (const sound of sounds) {
-    try {
-      const buf = xfer.serializeExamples(sound.r);
-      if (buf) await saveKanaExample(sound.r, buf);
-    } catch (e) { console.warn('saveKanaExamplesFor failed for', sound.r, e); }
-  }
-}
-
 // ── SESSION HISTORY ───────────────────────────────────────────────────────────
-// Two stores: sessions (one per practice session) and attempts (one per card).
 function histDb() {
   return new Promise((res, rej) => {
     const req = indexedDB.open('kana-history', 2);
@@ -157,12 +73,13 @@ function saveAttempt(a) {
   }).catch(e => console.warn('history write failed', e));
 }
 
-async function startSession() {
+async function startFlipSession(selIds, flipSettings) {
   const row = {
     startTs:     Date.now(),
     tz:          Intl.DateTimeFormat().resolvedOptions().timeZone,
-    practiceSet: [...trainedIds],
-    settings:    JSON.stringify(getSettings()),
+    practiceSet: [...selIds],
+    settings:    JSON.stringify(flipSettings),
+    mode:        'flip',
     lat:         null,
     lng:         null,
   };
@@ -196,22 +113,4 @@ async function loadAllSessions() {
       req.onerror   = e => rej(e.target.error);
     });
   } catch { return []; }
-}
-
-async function startFlipSession(selIds, flipSettings) {
-  const row = {
-    startTs:     Date.now(),
-    tz:          Intl.DateTimeFormat().resolvedOptions().timeZone,
-    practiceSet: [...selIds],
-    settings:    JSON.stringify(flipSettings),
-    mode:        'flip',
-    lat:         null,
-    lng:         null,
-  };
-  const id = await insertSession(row);
-  navigator.geolocation?.getCurrentPosition(
-    p => updateSessionLoc(id, p.coords.latitude, p.coords.longitude),
-    () => {}
-  );
-  return id;
 }

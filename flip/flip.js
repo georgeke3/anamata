@@ -178,9 +178,9 @@ function buildDeal() {
 function pickCard() {
   if (flDeck.length === 0) flDeck = buildDeal();
   if (!flLast) return flDeck.pop();
-  // Scan from top of deck for first card with a different front character
+  // Scan from top of deck for first card with a different romaji
   for (let i = flDeck.length - 1; i >= 0; i--) {
-    if (flDeck[i].front !== flLast.front) {
+    if (flDeck[i].r !== flLast.r) {
       const [card] = flDeck.splice(i, 1);
       return card;
     }
@@ -198,6 +198,7 @@ let flStats           = {};        // {romaji: {ok, tot}}
 let flStreak          = 0;
 let flRecentResults   = [];        // last 10 booleans
 let flRating          = false;
+let flRevealedAt      = 0;
 let flKeyOn           = false;
 let flRaf             = null;
 let flCurrentSessionId = null;
@@ -279,19 +280,18 @@ function enterFlip() {
   flCurrentSessionId = null;
   flRespTimes        = [];
   flCardShownAt      = 0;
+  flRevealedAt       = 0;
   flLifetimeStats    = {};
 
-  if (flPickMode === 'lifetime') {
-    loadAllAttempts().then(all => {
-      for (const a of all) {
-        if (a.mode !== 'flip') continue;
-        if (!flLifetimeStats[a.kana]) flLifetimeStats[a.kana] = { ok: 0, tot: 0 };
-        flLifetimeStats[a.kana].tot++;
-        if (a.hit) flLifetimeStats[a.kana].ok++;
-      }
-      flDeck = buildDeal(); // rebuild deal with lifetime weights now loaded
-    }).catch(() => {});
-  }
+  loadAllAttempts().then(all => {
+    for (const a of all) {
+      if (a.mode !== 'flip') continue;
+      if (!flLifetimeStats[a.kana]) flLifetimeStats[a.kana] = { ok: 0, tot: 0 };
+      flLifetimeStats[a.kana].tot++;
+      if (a.hit) flLifetimeStats[a.kana].ok++;
+    }
+    if (flPickMode === 'lifetime') flDeck = buildDeal();
+  }).catch(() => {});
 
   startFlipSession([...flSelIds], { hira: flShowHira, kata: flShowKata, timerMs: flTimerMs })
     .then(id => { flCurrentSessionId = id; })
@@ -326,6 +326,7 @@ function nextCard() {
 function revealCard() {
   if (flState !== 'front') return;
   stopTimer();
+  flRevealedAt = Date.now();
   flState = 'revealed';
 
   const romajiStr = flCur.alt ? flCur.r + ' · ' + flCur.alt.join(' · ') : flCur.r;
@@ -342,7 +343,7 @@ function rateCard(correct) {
 
   flTot++;
   if (correct) { flOk++; flStreak++; } else { flStreak = 0; }
-  flRespTimes.push(Date.now() - flCardShownAt);
+  flRespTimes.push(flRevealedAt - flCardShownAt);
 
   flRecentResults.push(correct);
   if (flRecentResults.length > 10) flRecentResults.shift();
@@ -359,7 +360,7 @@ function rateCard(correct) {
       romaji:    flCur.r,
       hit:       correct,
       reason:    correct ? 'correct' : 'wrong',
-      ms:        Date.now() - flCardShownAt,
+      ms:        flRevealedAt - flCardShownAt,
       mode:      'flip',
     });
   }
@@ -469,6 +470,37 @@ function showFlipSummary() {
     renderSection('combos', FL_COMBO_ROWS.filter(r =>
       flSelIds.has(r.baseId) && (!r.requiresDakuten || flShowDakuten)
     ));
+  }
+
+  // Worst kana (lifetime)
+  const weakEl = $('fls-weakest');
+  if (weakEl) {
+    const byRomaji = {};
+    for (const [ch, st] of Object.entries(flLifetimeStats)) {
+      const card = flPool.find(c => c.front === ch);
+      if (!card) continue;
+      const key = card.r;
+      if (!byRomaji[key]) byRomaji[key] = { ok: 0, tot: 0, front: ch };
+      byRomaji[key].ok  += st.ok;
+      byRomaji[key].tot += st.tot;
+    }
+    const worst = Object.entries(byRomaji)
+      .filter(([, s]) => s.tot >= 3)
+      .sort((a, b) => (a[1].ok / a[1].tot) - (b[1].ok / b[1].tot))
+      .slice(0, 5);
+    if (worst.length) {
+      weakEl.innerHTML = '<div class="fls-weak-lbl">worst (lifetime)</div>' +
+        worst.map(([r, s]) => {
+          const pct = Math.round(s.ok / s.tot * 100);
+          return `<div class="hist-weak-row">` +
+            `<span class="hist-weak-char">${s.front}</span>` +
+            `<span class="hist-weak-romaji">${r}</span>` +
+            `<div class="hist-weak-bar-wrap"><div class="hist-weak-bar" style="width:${pct}%"></div></div>` +
+            `<span class="hist-weak-acc">${pct}%</span></div>`;
+        }).join('');
+    } else {
+      weakEl.innerHTML = '';
+    }
   }
 
   showScreen('flip-sum');

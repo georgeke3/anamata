@@ -265,6 +265,13 @@ const KD_NOTES = {
   'ぷ': 'Mimetics and loanwords only; ぷにぷに (squishy) is a classic example.',
   'ぺ': 'Rare in native words; mostly loanwords (ぺらぺら = fluent/chatty is an exception).',
   'ぽ': 'Like all p-kana, almost exclusively in loanwords and sound-symbolic mimetics.',
+
+  // ── katakana — only the ones with genuinely distinct facts ──
+  'ヲ': 'Katakana ヲ is even rarer than hiragana を — almost never appears in modern text.',
+  'ン': 'Easy to confuse with ソ and ノ in handwriting; the stroke direction is the tell.',
+  'ヂ': 'Effectively obsolete in katakana — foreign loanwords with a "ji" sound always use ジ.',
+  'ヅ': 'Effectively obsolete in katakana — foreign loanwords with a "zu" sound always use ズ.',
+  'ヴ': 'Created specifically for foreign "v" sounds (ヴァイオリン = violin); has no hiragana equivalent. Some style guides prefer バ行 instead.',
 };
 
 // ── DETAIL ────────────────────────────────────────────────────────────────────

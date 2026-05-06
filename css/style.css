@@ -289,13 +289,11 @@ ruby { ruby-align: center; }
 rt { font-size: .42em; color: #555; }
 .kd-ex-meta { display: flex; align-items: center; gap: .5rem; margin-top: .3rem; }
 .kd-ex-tag { font-size: .52rem; color: #252525; letter-spacing: .1em; text-transform: uppercase; min-width: 3.8rem; flex-shrink: 0; }
-.kd-ex-reveal { display: flex; gap: .35rem; align-items: center; }
-.kd-ex-romaji  { font-size: .78rem; color: #1a1a1a; transition: color .15s; letter-spacing: .03em; }
-.kd-ex-dot     { font-size: .7rem;  color: #1a1a1a; transition: color .15s; }
-.kd-ex-meaning { font-size: .75rem; color: #1a1a1a; transition: color .15s; }
-.kd-revealed .kd-ex-romaji  { color: #666; }
-.kd-revealed .kd-ex-dot     { color: #333; }
-.kd-revealed .kd-ex-meaning { color: #555; }
+.kd-ex-reveal { display: flex; gap: .35rem; align-items: center; visibility: hidden; }
+.kd-revealed .kd-ex-reveal { visibility: visible; }
+.kd-ex-romaji  { font-size: .78rem; color: #666; letter-spacing: .03em; }
+.kd-ex-dot     { font-size: .7rem;  color: #333; }
+.kd-ex-meaning { font-size: .75rem; color: #555; }
 .kd-no-data { font-size: .75rem; color: #2a2a2a; }
 
 /* make weakest rows tappable */

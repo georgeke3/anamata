@@ -25,6 +25,9 @@
     <div style="display:flex;gap:.4rem;align-items:center">
       <button class="btn toggle-btn on" id="fl-set-hira" title="Hiragana">あ</button>
       <button class="btn toggle-btn on" id="fl-set-kata" title="Katakana">ア</button>
+      <button class="btn-gear" id="btn-kana-grid" title="Kana grid">
+        <svg viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1.5"/><circle cx="6" cy="2" r="1.5"/><circle cx="10" cy="2" r="1.5"/><circle cx="2" cy="6" r="1.5"/><circle cx="6" cy="6" r="1.5"/><circle cx="10" cy="6" r="1.5"/><circle cx="2" cy="10" r="1.5"/><circle cx="6" cy="10" r="1.5"/><circle cx="10" cy="10" r="1.5"/></svg>
+      </button>
       <button class="btn-gear" id="btn-fl-history" title="Stats">
         <svg viewBox="0 0 15 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="6" width="4" height="6" rx="1"/><rect x="5.5" y="3" width="4" height="9" rx="1"/><rect x="11" y="0" width="4" height="12" rx="1"/></svg>
       </button>
@@ -133,6 +136,23 @@
   <button class="btn" id="btn-sessions-back" data-swipe-back style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
 </section>
 
+<!-- ── KANA GRID ────────────────────────────────────────────────────────────── -->
+<section id="s-kana-grid" class="screen">
+  <h2>KANA</h2>
+  <div id="kd-grid-body"></div>
+  <button class="btn" id="btn-kdg-back" data-swipe-back style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
+</section>
+
+<!-- ── KANA DETAIL ──────────────────────────────────────────────────────────── -->
+<section id="s-kana-detail" class="screen">
+  <div id="kd-char-wrap">
+    <div id="kd-char" class="big"></div>
+    <span id="kd-font-name"></span>
+  </div>
+  <div id="kd-examples"></div>
+  <button class="btn" id="btn-kd-back" data-swipe-back style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
+</section>
+
 <!-- ── WEAKEST FULL LIST ───────────────────────────────────────────────────── -->
 <section id="s-weakest" class="screen">
   <h2>WEAKEST</h2>
@@ -143,6 +163,8 @@
 <script src="js/app.js"></script>
 <script src="js/db.js"></script>
 <script src="js/history.js"></script>
+<script src="js/kana-data.js"></script>
+<script src="js/kana-detail.js"></script>
 <script src="flip/flip.js"></script>
 <script src="js/init.js"></script>
 </body>

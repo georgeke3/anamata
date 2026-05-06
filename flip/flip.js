@@ -492,7 +492,7 @@ function showFlipSummary() {
       weakEl.innerHTML = '<div class="fls-weak-lbl">worst</div>' +
         worst.map(([r, s]) => {
           const pct = Math.round(s.ok / s.tot * 100);
-          return `<div class="hist-weak-row">` +
+          return `<div class="hist-weak-row" data-kana-link="${s.front}" data-kana-from="flip-sum">` +
             `<span class="hist-weak-char">${s.front}</span>` +
             `<span class="hist-weak-romaji">${r}</span>` +
             `<div class="hist-weak-bar-wrap"><div class="hist-weak-bar" style="width:${pct}%"></div></div>` +

@@ -86,7 +86,7 @@ function renderWeakestKana(attempts) {
 
   el.innerHTML = ranked.map(([romaji, st]) => {
     const pct = Math.round(st.ok / st.tot * 100);
-    return `<div class="hist-weak-row">` +
+    return `<div class="hist-weak-row" data-kana-link="${st.kana}" data-kana-from="history">` +
       `<span class="hist-weak-char">${st.kana}</span>` +
       `<span class="hist-weak-romaji">${romaji}</span>` +
       `<div class="hist-weak-bar-wrap"><div class="hist-weak-bar" style="width:${pct}%"></div></div>` +
@@ -137,7 +137,7 @@ async function enterWeakest() {
 
   el.innerHTML = ranked.map(([romaji, st]) => {
     const pct = Math.round(st.ok / st.tot * 100);
-    return `<div class="hist-weak-row">` +
+    return `<div class="hist-weak-row" data-kana-link="${st.kana}" data-kana-from="weakest">` +
       `<span class="hist-weak-char">${st.kana}</span>` +
       `<span class="hist-weak-romaji">${romaji}</span>` +
       `<div class="hist-weak-bar-wrap"><div class="hist-weak-bar" style="width:${pct}%"></div></div>` +

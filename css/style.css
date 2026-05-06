@@ -286,7 +286,7 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
 .kd-example:hover { border-color: #252525; }
 .kd-ex-word { font-size: 1.5rem; line-height: 1.7; user-select: text; -webkit-user-select: text; }
 ruby { ruby-align: center; }
-rt { font-size: .42em; color: #555; }
+rt { font-size: .42em; color: #555; user-select: none; -webkit-user-select: none; }
 .kd-ex-meta { display: flex; align-items: baseline; gap: .5rem; margin-top: .35rem; }
 .kd-ex-tag { font-size: .55rem; color: #252525; letter-spacing: .1em; text-transform: uppercase; min-width: 3.8rem; flex-shrink: 0; }
 .kd-ex-reveal { display: flex; gap: .35rem; align-items: baseline; visibility: hidden; }

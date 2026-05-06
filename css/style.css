@@ -149,13 +149,9 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
 
 /* home header */
 .home-hdr { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.btn-gear         { background: transparent; border: none; cursor: pointer; padding: .25rem .35rem; transition: color .12s, opacity .1s; color: #444; letter-spacing: 0; line-height: 1; display: flex; align-items: center; }
+.btn-gear         { background: transparent; border: none; cursor: pointer; padding: .25rem .35rem; transition: color .12s, opacity .1s; color: #484848; letter-spacing: 0; font-size: .9rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
 .btn-gear:hover   { color: #666; }
 .btn-gear:active  { opacity: .6; }
-#btn-fl-history   { font-size: .85rem; color: #3a5a3a; }
-#btn-fl-history:hover { color: #4caf50; }
-#btn-fl-settings  { font-size: 1rem; color: #383838; position: relative; top: -1px; }
-#btn-fl-settings:hover { color: #666; }
 
 /* manage training screen */
 .mng-grid { display: flex; flex-direction: column; gap: .6rem; width: 100%; }

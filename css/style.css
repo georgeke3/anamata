@@ -149,12 +149,12 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
 
 /* home header */
 .home-hdr { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.btn-gear         { background: transparent; border: none; cursor: pointer; padding: .25rem .4rem; transition: color .12s, opacity .1s; font-size: .95rem; color: #444; letter-spacing: 0; }
+.btn-gear         { background: transparent; border: none; cursor: pointer; padding: .25rem .35rem; transition: color .12s, opacity .1s; color: #444; letter-spacing: 0; line-height: 1; display: flex; align-items: center; }
 .btn-gear:hover   { color: #666; }
 .btn-gear:active  { opacity: .6; }
-#btn-fl-history   { font-size: .8rem; color: #3a5a3a; }
+#btn-fl-history   { font-size: .85rem; color: #3a5a3a; }
 #btn-fl-history:hover { color: #4caf50; }
-#btn-fl-settings  { font-size: 1.05rem; color: #383838; }
+#btn-fl-settings  { font-size: 1rem; color: #383838; position: relative; top: -1px; }
 #btn-fl-settings:hover { color: #666; }
 
 /* manage training screen */
@@ -229,8 +229,12 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
 .hist-sess-date small { font-size: .62rem; color: #2a2a2a; }
 .hist-session-row     { align-items: flex-start; }
 .hist-sess-count      { color: #282828; font-size: .7rem; padding-top: 2px; }
-.hist-sess-del        { background: none; border: none; color: #2a2a2a; font-size: .7rem; cursor: pointer; padding: 0 0 0 .4rem; line-height: 1; }
-.hist-sess-del:hover  { color: #7a2a2a; }
+.hist-sess-del           { background: none; border: none; color: #2a2a2a; font-size: .7rem; cursor: pointer; padding: 0 0 0 .4rem; line-height: 1; white-space: nowrap; }
+.hist-sess-del:hover     { color: #7a2a2a; }
+.hist-sess-del.confirming { color: #9a2a2a; font-weight: bold; }
+.hist-see-all-row        { text-align: center; padding: .3rem 0; }
+#s-sessions              { gap: .3rem; overflow-y: auto; padding-bottom: 2rem; width: 100%; max-width: 400px; }
+#all-sessions-list       { width: 100%; display: flex; flex-direction: column; gap: .3rem; }
 .hist-see-all         { color: #2a2a2a; font-size: .55rem; cursor: pointer; margin-left: .4rem; letter-spacing: .06em; text-transform: none; }
 .hist-see-all:hover   { color: #555; }
 .hist-weak-tot        { font-size: .65rem; color: #252525; width: 2rem; text-align: right; }

@@ -28,6 +28,24 @@ function renderLifetimeStats(attempts, sessions) {
     `${sessions.length} sessions  ·  ${correct.toLocaleString()} / ${attempts.length.toLocaleString()}  ·  ${pct}%`;
 }
 
+function sessionRowHtml(s, atts) {
+  if (!atts.length) return '';
+  const ok    = atts.filter(a => a.hit).length;
+  const pct   = Math.round(ok / atts.length * 100);
+  const dt    = new Date(s.startTs);
+  const date  = dt.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+  const time  = dt.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', timeZoneName:'short'});
+  const color = pct >= 80 ? '#3a7a3a' : pct >= 60 ? '#6a5a20' : '#6a2a2a';
+  const msTimes = atts.map(a => a.ms).filter(ms => ms > 0);
+  const avgMs   = msTimes.length ? Math.round(msTimes.reduce((a, b) => a + b, 0) / msTimes.length) : 0;
+  const countStr = `${atts.length} cards${avgMs ? ' · ' + (avgMs / 1000).toFixed(1) + 's avg' : ''}`;
+  return `<div class="hist-session-row" data-id="${s.id}">` +
+    `<span class="hist-sess-date"><span>${date}</span><small>${time}</small></span>` +
+    `<span class="hist-sess-acc" style="color:${color}">${pct}%</span>` +
+    `<span class="hist-sess-count">${countStr}</span>` +
+    `<button class="hist-sess-del" title="Delete">✕</button></div>`;
+}
+
 function renderRecentSessions(sessions, attempts) {
   const el = document.getElementById('hist-sessions');
   if (!sessions.length) { el.innerHTML = '<div class="hist-empty">no sessions yet</div>'; return; }
@@ -37,26 +55,12 @@ function renderRecentSessions(sessions, attempts) {
     (bySession[a.sessionId] ||= []).push(a);
   }
 
-  const sorted = [...sessions].sort((a, b) => b.startTs - a.startTs);
-  el.innerHTML = sorted.map(s => {
-    const atts = bySession[s.id] || [];
-    if (!atts.length) return '';
-    const ok    = atts.filter(a => a.hit).length;
-    const pct   = Math.round(ok / atts.length * 100);
-    const dt    = new Date(s.startTs);
-    const date  = dt.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
-    const time  = dt.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', timeZoneName:'short'});
-    const color = pct >= 80 ? '#3a7a3a' : pct >= 60 ? '#6a5a20' : '#6a2a2a';
-    const msTimes = atts.map(a => a.ms).filter(ms => ms > 0);
-    const avgMs   = msTimes.length ? Math.round(msTimes.reduce((a, b) => a + b, 0) / msTimes.length) : 0;
-    const countStr = `${atts.length} cards${avgMs ? ' · ' + (avgMs / 1000).toFixed(1) + 's avg' : ''}`;
-    return `<div class="hist-session-row" data-id="${s.id}">` +
-      `<span class="hist-sess-date"><span>${date}</span><small>${time}</small></span>` +
-      `<span class="hist-sess-acc" style="color:${color}">${pct}%</span>` +
-      `<span class="hist-sess-count">${countStr}</span>` +
-      `<button class="hist-sess-del" title="Delete">✕</button></div>`;
-  }).join('');
-
+  const sorted  = [...sessions].sort((a, b) => b.startTs - a.startTs);
+  const preview = sorted.slice(0, 10);
+  const seeAll  = sorted.length > 10
+    ? `<div class="hist-see-all-row"><span class="hist-see-all" id="hist-sess-see-all">see all ${sorted.length} →</span></div>`
+    : '';
+  el.innerHTML = preview.map(s => sessionRowHtml(s, bySession[s.id] || [])).join('') + seeAll;
 }
 
 function renderWeakestKana(attempts) {
@@ -88,6 +92,23 @@ function renderWeakestKana(attempts) {
       `<div class="hist-weak-bar-wrap"><div class="hist-weak-bar" style="width:${pct}%"></div></div>` +
       `<span class="hist-weak-acc">${pct}%</span></div>`;
   }).join('');
+}
+
+// ── ALL SESSIONS SCREEN ───────────────────────────────────────────────────────
+async function enterAllSessions() {
+  showScreen('sessions');
+  const el = document.getElementById('all-sessions-list');
+  el.innerHTML = 'loading…';
+
+  const [allAttempts, allSessions] = await Promise.all([loadAllAttempts(), loadAllSessions()]);
+  const attempts = allAttempts.filter(a => a.mode === 'flip');
+  const sessions = allSessions.filter(s => s.mode === 'flip');
+
+  const bySession = {};
+  for (const a of attempts) (bySession[a.sessionId] ||= []).push(a);
+
+  const sorted = [...sessions].sort((a, b) => b.startTs - a.startTs);
+  el.innerHTML = sorted.map(s => sessionRowHtml(s, bySession[s.id] || [])).join('') || '<div class="hist-empty">no sessions</div>';
 }
 
 // ── FULL WEAKEST SCREEN ───────────────────────────────────────────────────────
@@ -129,13 +150,22 @@ async function enterWeakest() {
 document.getElementById('btn-hist-back').addEventListener('click', () => enterFlipHome());
 
 document.getElementById('btn-wk-back').addEventListener('click', () => enterHistory());
+document.getElementById('btn-sessions-back').addEventListener('click', () => enterHistory());
 document.getElementById('hist-weakest-lbl').addEventListener('click', e => {
   if (e.target.closest('.hist-see-all')) enterWeakest();
 });
 
-document.getElementById('hist-sessions').addEventListener('click', async e => {
-  const btn = e.target.closest('.hist-sess-del');
-  if (!btn) return;
+async function handleSessionDelete(btn) {
+  if (!btn.classList.contains('confirming')) {
+    // First tap: ask for confirmation
+    document.querySelectorAll('.hist-sess-del.confirming').forEach(b => {
+      b.classList.remove('confirming'); b.textContent = '✕';
+    });
+    btn.classList.add('confirming');
+    btn.textContent = 'delete?';
+    return;
+  }
+  // Second tap: confirmed
   const row = btn.closest('.hist-session-row');
   const id  = Number(row.dataset.id);
   await deleteSession(id);
@@ -145,4 +175,25 @@ document.getElementById('hist-sessions').addEventListener('click', async e => {
     allAttempts.filter(a => a.mode === 'flip'),
     allSessions.filter(s => s.mode === 'flip')
   );
+}
+
+document.addEventListener('click', e => {
+  // Cancel confirming state if clicking outside a del button
+  if (!e.target.closest('.hist-sess-del')) {
+    document.querySelectorAll('.hist-sess-del.confirming').forEach(b => {
+      b.classList.remove('confirming'); b.textContent = '✕';
+    });
+  }
 });
+
+function wireSessionList(el) {
+  el.addEventListener('click', async e => {
+    const del = e.target.closest('.hist-sess-del');
+    if (del) { await handleSessionDelete(del); return; }
+    const seeAll = e.target.closest('#hist-sess-see-all');
+    if (seeAll) enterAllSessions();
+  });
+}
+
+wireSessionList(document.getElementById('hist-sessions'));
+wireSessionList(document.getElementById('all-sessions-list'));

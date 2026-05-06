@@ -86,6 +86,23 @@ async function startFlipSession(selIds, flipSettings) {
   return insertSession(row);
 }
 
+async function deleteSession(id) {
+  const db = await histDb();
+  return new Promise((res, rej) => {
+    const tx    = db.transaction(['sessions', 'attempts'], 'readwrite');
+    tx.objectStore('sessions').delete(id);
+    const idx   = tx.objectStore('attempts').index('sessionId');
+    const range = IDBKeyRange.only(id);
+    const req   = idx.openCursor(range);
+    req.onsuccess = e => {
+      const cur = e.target.result;
+      if (cur) { cur.delete(); cur.continue(); }
+    };
+    tx.oncomplete = res;
+    tx.onerror    = e => rej(e.target.error);
+  });
+}
+
 async function loadAllAttempts() {
   try {
     const db = await histDb();

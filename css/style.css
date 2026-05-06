@@ -31,7 +31,8 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
   font-size: .85rem;
   transition: border-color .12s, color .12s;
 }
-.btn:hover:not(:disabled) { border-color: #444; color: #bbb; }
+.btn:hover:not(:disabled):not(.toggle-btn) { border-color: #444; color: #bbb; }
+.btn:active:not(:disabled) { opacity: .7; }
 .btn:disabled { opacity: .25; cursor: default; }
 .btn.go { border-color: #2a4a2a; color: #4caf50; }
 .btn.go:hover:not(:disabled) { border-color: #4caf50; }
@@ -148,8 +149,13 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
 
 /* home header */
 .home-hdr { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-.btn-gear { background: transparent; border: none; color: #555; font-size: 1rem; cursor: pointer; padding: .25rem .4rem; transition: color .12s; }
-.btn-gear:hover { color: #666; }
+.btn-gear         { background: transparent; border: none; cursor: pointer; padding: .25rem .4rem; transition: color .12s, opacity .1s; font-size: .95rem; color: #444; letter-spacing: 0; }
+.btn-gear:hover   { color: #666; }
+.btn-gear:active  { opacity: .6; }
+#btn-fl-history   { font-size: .8rem; color: #3a5a3a; }
+#btn-fl-history:hover { color: #4caf50; }
+#btn-fl-settings  { font-size: 1.05rem; color: #383838; }
+#btn-fl-settings:hover { color: #666; }
 
 /* manage training screen */
 .mng-grid { display: flex; flex-direction: column; gap: .6rem; width: 100%; }
@@ -184,8 +190,10 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
 .setting-num { background: #111; border: 1px solid #252525; color: #888; padding: .3rem .5rem; border-radius: 5px; width: 5rem; font-size: .85rem; text-align: center; }
 .setting-unit { font-size: .75rem; color: #3a3a3a; }
 .toggle-btn { padding: .3rem .7rem; font-size: .75rem; }
-.toggle-btn.on  { border-color: #2a4a2a; color: #4caf50; }
-.toggle-btn.off-state { border-color: #1e1e1e; color: #333; }
+.toggle-btn.on         { border-color: #2a4a2a; color: #4caf50; }
+.toggle-btn.on:active  { opacity: .7; }
+.toggle-btn.off-state  { border-color: #1e1e1e; color: #333; }
+.toggle-btn.off-state:active { opacity: .7; }
 
 /* stats bar enhancement */
 .pr-score-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }

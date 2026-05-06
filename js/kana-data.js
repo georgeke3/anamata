@@ -282,6 +282,16 @@ const KANA_EXAMPLES = {
       slang:   { word: "だぞ",   reading: "だぞ",    meaning: "Assertion" },
       pokemon: { word: "ぞろあーく", reading: "ぞろあーく", meaning: "Zoroark" }
     },
+    "ぢ": {
+      common:  { word: "鼻血",   reading: "はな ぢ", meaning: "Nosebleed" },
+      slang:   { word: "いぢる", reading: "いぢる",  meaning: "To mess with" },
+      pokemon: { word: "N/A",   reading: "N/A",     meaning: "N/A" }
+    },
+    "づ": {
+      common:  { word: "続く",     reading: "つづ く",   meaning: "To continue" },
+      slang:   { word: "こづかい", reading: "こづかい",  meaning: "Pocket money" },
+      pokemon: { word: "N/A",     reading: "N/A",       meaning: "N/A" }
+    },
     "だ": {
       common:  { word: "大学",     reading: "だい がく", meaning: "University" },
       slang:   { word: "だれとく", reading: "だれ とく", meaning: "Who benefits?" },
@@ -628,6 +638,16 @@ const KANA_EXAMPLES = {
       common:  { word: "ゾーン", reading: "ゾーン", meaning: "Zone" },
       slang:   { word: "〜ゾ",   reading: "ぞ",     meaning: "Assertion" },
       pokemon: { word: "ゾロアーク", reading: "ゾロアーク", meaning: "Zoroark" }
+    },
+    "ヂ": {
+      common:  { word: "N/A", reading: "N/A", meaning: "N/A" },
+      slang:   { word: "N/A", reading: "N/A", meaning: "N/A" },
+      pokemon: { word: "N/A", reading: "N/A", meaning: "N/A" }
+    },
+    "ヅ": {
+      common:  { word: "N/A", reading: "N/A", meaning: "N/A" },
+      slang:   { word: "N/A", reading: "N/A", meaning: "N/A" },
+      pokemon: { word: "N/A", reading: "N/A", meaning: "N/A" }
     },
     "ダ": {
       common:  { word: "大学",     reading: "ダイガク",  meaning: "University" },

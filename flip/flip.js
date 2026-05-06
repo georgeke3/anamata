@@ -476,7 +476,7 @@ function showFlipSummary() {
   const weakEl = $('fls-weakest');
   if (weakEl) {
     const byRomaji = {};
-    for (const [ch, st] of Object.entries(flLifetimeStats)) {
+    for (const [ch, st] of Object.entries(flStats)) {
       const card = flPool.find(c => c.front === ch);
       if (!card) continue;
       const key = card.r;
@@ -485,11 +485,11 @@ function showFlipSummary() {
       byRomaji[key].tot += st.tot;
     }
     const worst = Object.entries(byRomaji)
-      .filter(([, s]) => s.tot >= 3)
+      .filter(([, s]) => s.tot >= 1)
       .sort((a, b) => (a[1].ok / a[1].tot) - (b[1].ok / b[1].tot))
       .slice(0, 5);
     if (worst.length) {
-      weakEl.innerHTML = '<div class="fls-weak-lbl">worst (lifetime)</div>' +
+      weakEl.innerHTML = '<div class="fls-weak-lbl">worst</div>' +
         worst.map(([r, s]) => {
           const pct = Math.round(s.ok / s.tot * 100);
           return `<div class="hist-weak-row">` +

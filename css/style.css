@@ -295,6 +295,7 @@ rt { font-size: .42em; color: #555; user-select: none; -webkit-user-select: none
 .kd-ex-dot     { font-size: .78rem; color: #333; }
 .kd-ex-meaning { font-size: .78rem; color: #555; }
 .kd-no-data { font-size: .75rem; color: #2a2a2a; }
+#kd-note { font-size: .68rem; color: #3a3a3a; text-align: center; max-width: 280px; line-height: 1.55; padding: 0 .5rem; }
 
 /* make weakest rows tappable */
 .hist-weak-row[data-kana-link] { cursor: pointer; }

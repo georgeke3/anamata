@@ -176,6 +176,97 @@ function kdGridColor(acc) {
   return `rgb(16, ${Math.round(30 + 70 * t)}, 16)`;
 }
 
+// ── NOTES ─────────────────────────────────────────────────────────────────────
+const KD_NOTES = {
+  // ── vowels ──
+  'あ': 'The most open vowel; leads every kana chart and countless native words.',
+  'い': 'The front high vowel; also the classical い-adjective stem (高い, 赤い).',
+  'う': 'Sometimes devoiced between voiceless consonants (e.g. です sounds like "des").',
+  'え': 'One of the rarer vowels in Japanese roots; very common as a particle/interjection.',
+  'お': 'Also the honorific prefix お (お茶, お金); highly frequent in everyday speech.',
+  // ── k row ──
+  'か': 'Also the question particle か; one of the most-used kana in the language.',
+  'き': 'Common as a noun-forming suffix (好き, 書き); appears in many compound sounds (きゃ etc.).',
+  'く': 'The plain-form ending for u-verbs (書く, 飲む→飲む but 書く ends in く).',
+  'け': 'Relatively infrequent as a standalone mora; mostly appears mid-word.',
+  'こ': 'Pronoun root こ- (this): これ, ここ, こんな; extremely high frequency.',
+  // ── s row ──
+  'さ': 'Often a nominalizer suffix (悲しさ, 高さ); also the interjection "well then".',
+  'し': 'Most common reading of し in し ending verbs; also the て-form connector し.',
+  'す': 'The polite copula ます/です both end in す; ubiquitous in formal speech.',
+  'せ': 'Appears in せい (blame/height), せんせい; less common than other s-row members.',
+  'そ': 'Mid-distance demonstrative root そ- (that): それ, そこ, そんな.',
+  // ── t row ──
+  'た': 'The plain past tense ending (食べた, 書いた); among the most-used kana.',
+  'ち': 'Pronounced "chi" not "ti"; also ち as a suffix in うち (home/we).',
+  'つ': 'Pronounced "tsu"; appears doubled as っ (small tsu) to geminate the next consonant.',
+  'て': 'The て-form connector is the backbone of Japanese grammar; enormously frequent.',
+  'と': 'Multi-use particle: "and" (リンゴとバナナ), "with", and quotation (と言った).',
+  // ── n row ──
+  'な': 'The な-adjective/copula stem (きれいな); also the prohibitive な (するな).',
+  'に': 'The direction/location/time particle に; one of the highest-frequency particles.',
+  'ぬ': 'Classical negative auxiliary (食べぬ); largely replaced by ない in modern Japanese.',
+  'ね': 'Sentence-final particle seeking agreement ("right?"); extremely common in speech.',
+  'の': 'The possessive/nominalizer particle の; appears in almost every sentence.',
+  // ── h row ──
+  'は': 'The topic marker — written は but read "wa"; arguably the most important particle.',
+  'ひ': 'Also the number "one" in native counting (ひとつ); appears in ひと (person).',
+  'ふ': 'Pronounced "fu" not "hu"; the only H-row kana with an irregular romanization.',
+  'へ': 'Direction particle — written へ but read "e"; marks destination (東京へ行く).',
+  'ほ': 'Appears in ほん (book), ほか (other); also the interjection ほら ("look!").',
+  // ── m row ──
+  'ま': 'Appears in まだ (still), また (again), まあ (well); very high frequency.',
+  'み': 'The stem of 見る (to see); also used in み as a nominalizer (楽しみ).',
+  'む': 'The plain negative む (archaic); today mostly appears mid-word (むずかしい).',
+  'め': '目 (eye) is one of the most basic kanji; め also means "you" in rough speech.',
+  'も': 'The additive particle も ("also", "even"); appears in negative constructions too.',
+  // ── y row ──
+  'や': 'Informal "and/or" particle (リンゴやバナナ); also the row label for ya/yu/yo.',
+  'ゆ': 'Appears in ゆっくり (slowly), ゆめ (dream); less common as a standalone mora.',
+  'よ': 'Sentence-final assertive particle よ ("you know!"); extremely common in speech.',
+  // ── r row ──
+  'ら': 'Pluralizing suffix (彼ら, 君ら); also the classical conditional ら (now ば).',
+  'り': 'The nominalizer り (やはり, つまり); り in ている→ている gives -ri compounds.',
+  'る': 'The plain-form ending for ru-verbs (食べる, 見る); ubiquitous.',
+  'れ': 'Appears in これ/それ/あれ (this/that/that over there); the れ in passive form.',
+  'ろ': 'The imperative ending in classical Japanese (見ろ, 来ろ); still common informally.',
+  // ── w row ──
+  'わ': 'The topic-marker historical source; わ alone means "I" in feminine/archaic speech.',
+  'を': 'Object marker only; always read "o" today; rarely starts a word.',
+  // ── n ──
+  'ん': 'The only pure nasal kana; can end a word but never start one in native vocab.',
+  // ── g row ──
+  'が': 'The subject particle が; also marks contrast and exhaustive listing.',
+  'ぎ': 'Voiced version of き; appears in ぎり (limit/duty) and many loanword adaptations.',
+  'ぐ': 'Voiced version of く; also a mimetic suffix (ぐちゃぐちゃ = mushy/messy).',
+  'げ': 'Voiced version of け; げ expresses appearance/feeling (悲しげ, 嬉しげ).',
+  'ご': 'Voiced version of こ; also the honorific prefix ご (ご家族, ご連絡).',
+  // ── z row ──
+  'ざ': 'Voiced version of さ; appears in ざっし (magazine), ざんねん (unfortunate).',
+  'じ': 'Pronounced "ji" (same as ぢ); the standard kana for this sound in modern Japanese.',
+  'ず': 'The negative て-form (食べずに); also voiced version of す in many words.',
+  'ぜ': 'Voiced version of せ; appears in ぜったい (absolutely), ぜひ (by all means).',
+  'ぞ': 'Emphatic sentence-final particle in classical/masculine speech (行くぞ!).',
+  // ── d row ──
+  'だ': 'The plain copula (これだ = "it\'s this"); plain-past form of です.',
+  'ぢ': 'Same sound as じ today; nearly obsolete — kept in rendaku compounds like 鼻血 (nosebleed).',
+  'づ': 'Same sound as ず today; kept in words like 続く, 近づく by historical convention.',
+  'で': 'The location-of-action particle (公園で遊ぶ); also the て-form of だ.',
+  'ど': 'Voiced version of と; also どう (how), どこ (where), どれ (which).',
+  // ── b row ──
+  'ば': 'The conditional form ば (食べれば = "if [one] eats"); also voiced version of は.',
+  'び': 'Voiced version of ひ; appears in びっくり (surprised), びょういん (hospital).',
+  'ぶ': 'Voiced version of ふ; also colloquial shortening of words (さぼる←サボタージュ).',
+  'べ': 'Voiced version of へ; べつに (not particularly) and べんり (convenient) are common.',
+  'ぼ': 'Voiced version of ほ; ぼく (I/me, informal male) is one of the most common pronouns.',
+  // ── p row ──
+  'ぱ': 'P-sounds are rare in native Japanese; mostly appear in loanwords and mimetics.',
+  'ぴ': 'Appears mostly in loanwords (ピアノ→ぴあの) and mimetics (ぴかぴか = shiny).',
+  'ぷ': 'Mimetics and loanwords only; ぷにぷに (squishy) is a classic example.',
+  'ぺ': 'Rare in native words; mostly loanwords (ぺらぺら = fluent/chatty is an exception).',
+  'ぽ': 'Like all p-kana, almost exclusively in loanwords and sound-symbolic mimetics.',
+};
+
 // ── DETAIL ────────────────────────────────────────────────────────────────────
 function enterKanaDetail(char, from) {
   kdChar    = char;
@@ -190,6 +281,10 @@ function kdRenderDetail() {
   charEl.textContent      = kdChar;
   charEl.style.fontFamily = KD_FONTS[kdFontIdx].family;
   document.getElementById('kd-font-name').textContent = KD_FONTS[kdFontIdx].name;
+
+  const noteEl = document.getElementById('kd-note');
+  noteEl.textContent = KD_NOTES[kdChar] || '';
+  noteEl.style.display = KD_NOTES[kdChar] ? '' : 'none';
 
   const script = kdIsHiragana(kdChar) ? 'hiragana' : 'katakana';
   const data   = KANA_EXAMPLES[script]?.[kdChar];

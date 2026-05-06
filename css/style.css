@@ -284,7 +284,7 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
   -webkit-tap-highlight-color: transparent; transition: border-color .12s;
 }
 .kd-example:hover { border-color: #252525; }
-.kd-ex-word { font-size: 1.5rem; line-height: 1.7; }
+.kd-ex-word { font-size: 1.5rem; line-height: 1.7; user-select: text; -webkit-user-select: text; }
 ruby { ruby-align: center; }
 rt { font-size: .42em; color: #555; }
 .kd-ex-meta { display: flex; align-items: center; gap: .5rem; margin-top: .3rem; }

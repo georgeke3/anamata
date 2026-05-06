@@ -193,9 +193,9 @@ const KANA_EXAMPLES = {
       pokemon: { word: "よわし", reading: "よわし", meaning: "Wishiwashi" }
     },
     "ら": {
-      common:  { word: "来週",     reading: "らい しゅう", meaning: "Next week" },
-      slang:   { word: "りあじゅう", reading: "りあ じゅう", meaning: "Normie" },
-      pokemon: { word: "らぷらす", reading: "らぷらす",     meaning: "Lapras" }
+      common:  { word: "来週",       reading: "らい しゅう", meaning: "Next week" },
+      slang:   { word: "ラグる",     reading: "らぐ る",     meaning: "To lag (Gaming)" },
+      pokemon: { word: "らうどぼーん", reading: "らうどぼーん", meaning: "Skeledirge" }
     },
     "り": {
       common:  { word: "林檎",   reading: "りん ご", meaning: "Apple" },
@@ -333,12 +333,12 @@ const KANA_EXAMPLES = {
       pokemon: { word: "ぴかちゅう", reading: "ぴかちゅう", meaning: "Pikachu" }
     },
     "ぷ": {
-      common:  { word: "全部",   reading: "ぜん ぶ", meaning: "All" },
+      common:  { word: "切符",   reading: "きっ ぷ",  meaning: "Ticket" },
       slang:   { word: "ぷぎゃー", reading: "ぷぎゃー", meaning: "Laughing" },
       pokemon: { word: "ぷりん", reading: "ぷりん",   meaning: "Jigglypuff" }
     },
     "ぺ": {
-      common:  { word: "平気",     reading: "へい き",   meaning: "Fine" },
+      common:  { word: "ほっぺ",   reading: "ほっ ぺ",   meaning: "Cheek" },
       slang:   { word: "ぺこ",     reading: "ぺこ",      meaning: "Hungry" },
       pokemon: { word: "ぺりっぱー", reading: "ぺりっぱー", meaning: "Pelipper" }
     },
@@ -380,9 +380,9 @@ const KANA_EXAMPLES = {
       pokemon: { word: "カメックス", reading: "カメックス", meaning: "Blastoise" }
     },
     "キ": {
-      common:  { word: "ギター", reading: "ギター", meaning: "Guitar" },
-      slang:   { word: "キタ",   reading: "キタ",   meaning: "It's here!" },
-      pokemon: { word: "キモリ", reading: "キモリ", meaning: "Treecko" }
+      common:  { word: "キーボード", reading: "キー ボード", meaning: "Keyboard" },
+      slang:   { word: "キタ",       reading: "キタ",        meaning: "It's here!" },
+      pokemon: { word: "キモリ",     reading: "キモリ",      meaning: "Treecko" }
     },
     "ク": {
       common:  { word: "クラス", reading: "クラス", meaning: "Class" },
@@ -490,9 +490,9 @@ const KANA_EXAMPLES = {
       pokemon: { word: "フシギダネ", reading: "フシギダネ", meaning: "Bulbasaur" }
     },
     "ヘ": {
-      common:  { word: "ベッド",   reading: "ベッド",   meaning: "Bed" },
-      slang:   { word: "ヘタレ",   reading: "ヘタレ",   meaning: "Coward" },
-      pokemon: { word: "ヘラクロス", reading: "ヘラクロス", meaning: "Heracross" }
+      common:  { word: "ヘリコプター", reading: "ヘリコプター", meaning: "Helicopter" },
+      slang:   { word: "ヘタレ",       reading: "ヘタレ",       meaning: "Coward" },
+      pokemon: { word: "ヘラクロス",   reading: "ヘラクロス",   meaning: "Heracross" }
     },
     "ホ": {
       common:  { word: "ホテル", reading: "ホテル", meaning: "Hotel" },
@@ -630,9 +630,9 @@ const KANA_EXAMPLES = {
       pokemon: { word: "ゾロアーク", reading: "ゾロアーク", meaning: "Zoroark" }
     },
     "ダ": {
-      common:  { word: "大学",   reading: "ダイガク", meaning: "University" },
-      slang:   { word: "誰得",   reading: "ダレ トク", meaning: "Who benefits?" },
-      pokemon: { word: "カイリュー", reading: "カイリュー", meaning: "Dragonite" }
+      common:  { word: "大学",     reading: "ダイガク",  meaning: "University" },
+      slang:   { word: "誰得",     reading: "ダレ トク", meaning: "Who benefits?" },
+      pokemon: { word: "ダグトリオ", reading: "ダグトリオ", meaning: "Dugtrio" }
     },
     "デ": {
       common:  { word: "データ", reading: "データ", meaning: "Data" },

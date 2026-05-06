@@ -56,11 +56,11 @@ function renderRecentSessions(sessions, attempts) {
   }
 
   const sorted  = [...sessions].sort((a, b) => b.startTs - a.startTs);
-  const preview = sorted.slice(0, 10);
-  const seeAll  = sorted.length > 10
-    ? `<div class="hist-see-all-row"><span class="hist-see-all" id="hist-sess-see-all">see all ${sorted.length} →</span></div>`
-    : '';
-  el.innerHTML = preview.map(s => sessionRowHtml(s, bySession[s.id] || [])).join('') + seeAll;
+  const lbl     = document.getElementById('hist-sessions-lbl');
+  lbl.innerHTML = sorted.length > 10
+    ? `recent sessions <span class="hist-see-all">see all ${sorted.length} →</span>`
+    : 'recent sessions';
+  el.innerHTML  = sorted.slice(0, 10).map(s => sessionRowHtml(s, bySession[s.id] || [])).join('');
 }
 
 function renderWeakestKana(attempts) {
@@ -151,6 +151,9 @@ document.getElementById('btn-hist-back').addEventListener('click', () => enterFl
 
 document.getElementById('btn-wk-back').addEventListener('click', () => enterHistory());
 document.getElementById('btn-sessions-back').addEventListener('click', () => enterHistory());
+document.getElementById('hist-sessions-lbl').addEventListener('click', e => {
+  if (e.target.closest('.hist-see-all')) enterAllSessions();
+});
 document.getElementById('hist-weakest-lbl').addEventListener('click', e => {
   if (e.target.closest('.hist-see-all')) enterWeakest();
 });
@@ -189,9 +192,7 @@ document.addEventListener('click', e => {
 function wireSessionList(el) {
   el.addEventListener('click', async e => {
     const del = e.target.closest('.hist-sess-del');
-    if (del) { await handleSessionDelete(del); return; }
-    const seeAll = e.target.closest('#hist-sess-see-all');
-    if (seeAll) enterAllSessions();
+    if (del) await handleSessionDelete(del);
   });
 }
 

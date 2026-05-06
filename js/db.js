@@ -83,12 +83,7 @@ async function startFlipSession(selIds, flipSettings) {
     lat:         null,
     lng:         null,
   };
-  const id = await insertSession(row);
-  navigator.geolocation?.getCurrentPosition(
-    p => updateSessionLoc(id, p.coords.latitude, p.coords.longitude),
-    () => {}
-  );
-  return id;
+  return insertSession(row);
 }
 
 async function loadAllAttempts() {

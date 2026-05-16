@@ -92,6 +92,7 @@ let flTimerMs     = 5000;
 let flShowDakuten = false;
 let flShowCombos  = false;
 let flPickMode      = 'session';  // 'random' | 'session' | 'lifetime'
+let flCoverageMode  = false;      // guarantee every card appears before extras repeat
 let flLifetimeStats = {};         // { front_char: {ok, tot} } — built from IndexedDB at session start
 
 function loadFlipSettings() {
@@ -102,16 +103,18 @@ function loadFlipSettings() {
     if (s.kata    !== undefined) flShowKata    = !!s.kata;
     if (s.timerMs)               flTimerMs     = +s.timerMs;
     if (Array.isArray(s.fonts) && s.fonts.length) flActiveFonts = new Set(s.fonts);
-    if (s.dakuten  !== undefined) flShowDakuten = !!s.dakuten;
-    if (s.combos   !== undefined) flShowCombos  = !!s.combos;
-    if (s.pickMode)               flPickMode    = s.pickMode;
+    if (s.dakuten  !== undefined) flShowDakuten  = !!s.dakuten;
+    if (s.combos   !== undefined) flShowCombos   = !!s.combos;
+    if (s.coverage !== undefined) flCoverageMode = !!s.coverage;
+    if (s.pickMode)               flPickMode     = s.pickMode;
   } catch {}
 }
 
 function saveFlipSettings() {
   localStorage.setItem('flip-settings', JSON.stringify({
     rows: [...flSelIds], hira: flShowHira, kata: flShowKata, timerMs: flTimerMs,
-    fonts: [...flActiveFonts], dakuten: flShowDakuten, combos: flShowCombos, pickMode: flPickMode,
+    fonts: [...flActiveFonts], dakuten: flShowDakuten, combos: flShowCombos,
+    coverage: flCoverageMode, pickMode: flPickMode,
   }));
 }
 
@@ -149,8 +152,8 @@ function buildPool() {
 
 // ── DEAL-BASED PICK ───────────────────────────────────────────────────────────
 // Each round is a weighted shuffle of the full pool — weak/unseen cards get
-// extra slots (unseen→2, 0%→3, 100%→1) so every card appears before heavy
-// repetition. Back-to-back same front character is prevented by swapping.
+// extra slots (unseen→3, 0%→5, 100%→1). Coverage mode deals a guaranteed
+// base pass first, then extras. Back-to-back same character is prevented.
 let flDeck = [];
 let flLast = null;
 
@@ -158,21 +161,37 @@ function cardSlots(card) {
   if (flPickMode === 'random') return 1;
   const map = flPickMode === 'lifetime' ? flLifetimeStats : flStats;
   const st  = map[card.front];
-  if (!st || st.tot === 0) return 2;
-  return Math.max(1, Math.round(1 + (1 - st.ok / st.tot) * 2));
+  if (!st || st.tot === 0) return 3;
+  const miss = 1 - st.ok / st.tot;
+  return Math.max(1, Math.round(1 + miss * 4));
+}
+
+function shuffleInPlace(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 function buildDeal() {
+  if (flCoverageMode) {
+    // Base pass guarantees every card appears once, extras added after
+    const base   = shuffleInPlace([...flPool]);
+    const extras = [];
+    for (const card of flPool) {
+      const n = cardSlots(card);
+      for (let i = 1; i < n; i++) extras.push(card);
+    }
+    shuffleInPlace(extras);
+    return [...extras, ...base]; // deck pops from end, so base is dealt first
+  }
   const deal = [];
   for (const card of flPool) {
     const n = cardSlots(card);
     for (let i = 0; i < n; i++) deal.push(card);
   }
-  for (let i = deal.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [deal[i], deal[j]] = [deal[j], deal[i]];
-  }
-  return deal;
+  return shuffleInPlace(deal);
 }
 
 function pickCard() {
@@ -557,6 +576,10 @@ $('btn-fl-settings').addEventListener('click', async () => {
   comboBtn.classList.toggle('on', flShowCombos);
   comboBtn.classList.toggle('off-state', !flShowCombos);
   comboBtn.textContent = flShowCombos ? 'ON' : 'OFF';
+  const covBtn = $('fl-set-coverage');
+  covBtn.classList.toggle('on', flCoverageMode);
+  covBtn.classList.toggle('off-state', !flCoverageMode);
+  covBtn.textContent = flCoverageMode ? 'ON' : 'OFF';
   ['random','session','lifetime'].forEach(m =>
     $('fl-pick-' + m).classList.toggle('on', flPickMode === m)
   );
@@ -591,6 +614,14 @@ $('fl-set-combos').addEventListener('click', () => {
   btn.classList.toggle('on', flShowCombos);
   btn.classList.toggle('off-state', !flShowCombos);
   btn.textContent = flShowCombos ? 'ON' : 'OFF';
+  saveFlipSettings();
+});
+$('fl-set-coverage').addEventListener('click', () => {
+  flCoverageMode = !flCoverageMode;
+  const btn = $('fl-set-coverage');
+  btn.classList.toggle('on', flCoverageMode);
+  btn.classList.toggle('off-state', !flCoverageMode);
+  btn.textContent = flCoverageMode ? 'ON' : 'OFF';
   saveFlipSettings();
 });
 ['random','session','lifetime'].forEach(m => {

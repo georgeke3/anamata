@@ -126,7 +126,7 @@
 <section id="s-history" class="screen">
   <h2>STATS</h2>
   <div id="hist-lifetime"></div>
-  <div class="hist-section-lbl" id="hist-sessions-lbl">recent sessions</div>
+  <div class="hist-section-lbl" id="hist-sessions-lbl">recent sessions <span class="hist-see-all" id="btn-hist-trends">trends →</span></div>
   <div id="hist-sessions"></div>
   <div class="hist-section-lbl" id="hist-weakest-lbl">weakest <span class="hist-see-all">see all →</span></div>
   <div id="hist-weakest"></div>
@@ -154,6 +154,7 @@
     <span id="kd-font-name"></span>
   </div>
   <div id="kd-note"></div>
+  <div id="kd-stats"></div>
   <div id="kd-examples"></div>
   <button class="btn" id="btn-kd-back" data-swipe-back style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
 </section>
@@ -165,9 +166,25 @@
   <button class="btn" id="btn-wk-back" data-swipe-back style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
 </section>
 
+<!-- ── TRENDS ────────────────────────────────────────────────────────────── -->
+<section id="s-trends" class="screen">
+  <h2>TRENDS</h2>
+  <div id="trd-filters"></div>
+  <div id="trd-body"></div>
+  <button class="btn" id="btn-trd-back" data-swipe-back style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
+</section>
+
+<!-- ── SESSION DETAIL ─────────────────────────────────────────────────────── -->
+<section id="s-session-detail" class="screen">
+  <h2>SESSION</h2>
+  <div id="sd-body"></div>
+  <button class="btn" id="btn-sd-back" data-swipe-back style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
+</section>
+
 <script src="js/app.js"></script>
 <script src="js/db.js"></script>
 <script src="js/history.js"></script>
+<script src="js/trends.js"></script>
 <script src="js/kana-data.js"></script>
 <script src="js/kana-detail.js"></script>
 <script src="flip/flip.js"></script>

@@ -281,6 +281,10 @@ function enterKanaDetail(char, from) {
   kdFontIdx = 0;
   kdRenderDetail();
   showScreen('kana-detail');
+  // Clear and async-load stats section
+  const statsEl = document.getElementById('kd-stats');
+  statsEl.innerHTML = '';
+  kdLoadStats(char);
 }
 
 function kdRenderDetail() {
@@ -391,10 +395,11 @@ document.getElementById('kd-char').addEventListener('click', () => {
 });
 
 document.getElementById('btn-kd-back').addEventListener('click', () => {
-  if      (kdFrom === 'flip-sum') showScreen('flip-sum');
-  else if (kdFrom === 'history')  enterHistory();
-  else if (kdFrom === 'weakest')  showScreen('weakest');
-  else                            enterKanaGrid();
+  if      (kdFrom === 'flip-sum')       showScreen('flip-sum');
+  else if (kdFrom === 'history')        enterHistory();
+  else if (kdFrom === 'weakest')        showScreen('weakest');
+  else if (kdFrom === 'session-detail') showScreen('session-detail');
+  else                                  enterKanaGrid();
 });
 
 document.getElementById('btn-kdg-back').addEventListener('click', () => enterFlipHome());

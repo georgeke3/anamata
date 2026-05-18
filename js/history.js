@@ -189,12 +189,16 @@ document.addEventListener('click', e => {
   }
 });
 
-function wireSessionList(el) {
+function wireSessionList(el, from) {
   el.addEventListener('click', async e => {
     const del = e.target.closest('.hist-sess-del');
-    if (del) await handleSessionDelete(del);
+    if (del) { await handleSessionDelete(del); return; }
+    const row = e.target.closest('.hist-session-row');
+    if (row && row.dataset.id) enterSessionDetail(+row.dataset.id, from || 'history');
   });
 }
 
-wireSessionList(document.getElementById('hist-sessions'));
-wireSessionList(document.getElementById('all-sessions-list'));
+wireSessionList(document.getElementById('hist-sessions'), 'history');
+wireSessionList(document.getElementById('all-sessions-list'), 'sessions');
+
+document.getElementById('btn-hist-trends').addEventListener('click', () => enterTrends('history'));

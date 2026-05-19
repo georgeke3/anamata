@@ -47,19 +47,20 @@ function charRow(kana) { return CHAR_ROW_MAP[kana[0]] || null; }
 // ── SVG LINE CHART ────────────────────────────────────────────────────────────
 // values: array of numbers or null (null = gap in line)
 
-function svgLine(values, {w=320, h=65, color='#1e3a1e', dotColor, refLine, minVal, maxVal} = {}) {
+function svgLine(values, {w=320, h=65, color='#1e3a1e', dotColor, refLine, minVal, maxVal, yFmt} = {}) {
   const valid = values.filter(v => v !== null && !isNaN(v));
   if (valid.length < 2) return '<div class="ts-empty">not enough data</div>';
 
   const lo  = minVal  ?? Math.min(...valid);
   const hi  = maxVal  ?? Math.max(...valid);
   const rng = hi === lo ? 1 : hi - lo;
-  const px = 6, py = 6, iw = w - px * 2, ih = h - py * 2;
+  const pl = yFmt ? 28 : 6, pr = 6, py = 6;
+  const iw = w - pl - pr, ih = h - py * 2;
   const n  = values.length;
 
   function coord(i, v) {
     return [
-      +(px + (n > 1 ? i / (n - 1) : 0.5) * iw).toFixed(1),
+      +(pl + (n > 1 ? i / (n - 1) : 0.5) * iw).toFixed(1),
       +(py + ih - ((v - lo) / rng) * ih).toFixed(1),
     ];
   }
@@ -84,10 +85,17 @@ function svgLine(values, {w=320, h=65, color='#1e3a1e', dotColor, refLine, minVa
   if (refLine !== undefined) {
     const ry = +(py + ih - ((refLine - lo) / rng) * ih).toFixed(1);
     if (ry > py && ry < py + ih)
-      ref = `<line x1="${px}" y1="${ry}" x2="${w - px}" y2="${ry}" stroke="#1a2a1a" stroke-width="1" stroke-dasharray="3,3"/>`;
+      ref = `<line x1="${pl}" y1="${ry}" x2="${w - pr}" y2="${ry}" stroke="#1a2a1a" stroke-width="1" stroke-dasharray="3,3"/>`;
+  }
+
+  let yAxis = '';
+  if (yFmt) {
+    yAxis = `<text x="${pl - 3}" y="${py + 7}" font-size="8" fill="#333" text-anchor="end">${yFmt(hi)}</text>` +
+            `<text x="${pl - 3}" y="${py + ih}" font-size="8" fill="#333" text-anchor="end">${yFmt(lo)}</text>`;
   }
 
   return `<div class="ts-chart"><svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" width="100%">` +
+    yAxis +
     ref +
     `<path d="${path}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>` +
     dots +
@@ -227,12 +235,12 @@ async function kdLoadStats(char) {
     const maxT    = allTs.length ? Math.max(...allTs) : 0;
 
     html += `<div class="ts-lbl">accuracy per session</div>`;
-    html += svgLine(accVals, { w: 300, h: 60, minVal: 0, maxVal: 1, refLine: 0.8, color: '#1e3a1e', dotColor: '#3a7a3a' });
+    html += svgLine(accVals, { w: 300, h: 60, minVal: 0, maxVal: 1, refLine: 0.8, color: '#1e3a1e', dotColor: '#3a7a3a', yFmt: v => Math.round(v * 100) + '%' });
 
     if (allTs.length >= 2) {
       html += `<div class="ts-lbl">response time per session · <span style="color:#3a7a3a">ok</span> <span style="color:#3c3c3c">/</span> <span style="color:#7a3a3a">miss</span></div>`;
-      if (okTs.some(v => v !== null)) html += svgLine(okTs,  { w: 300, h: 60, minVal: 0, maxVal: maxT, color: '#1e3a1e', dotColor: '#3a7a3a' });
-      if (miTs.some(v => v !== null)) html += svgLine(miTs,  { w: 300, h: 60, minVal: 0, maxVal: maxT, color: '#3a1414', dotColor: '#7a3a3a' });
+      if (okTs.some(v => v !== null)) html += svgLine(okTs,  { w: 300, h: 60, minVal: 0, maxVal: maxT, color: '#1e3a1e', dotColor: '#3a7a3a', yFmt: v => v.toFixed(1) + 's' });
+      if (miTs.some(v => v !== null)) html += svgLine(miTs,  { w: 300, h: 60, minVal: 0, maxVal: maxT, color: '#3a1414', dotColor: '#7a3a3a', yFmt: v => v.toFixed(1) + 's' });
     }
   }
 
@@ -372,7 +380,7 @@ async function refreshTrends() {
   // Accuracy chart
   const accVals = buckets.map(b => b.tot > 0 ? b.ok / b.tot : null);
   html += `<div class="ts-lbl">accuracy</div>`;
-  html += svgLine(accVals, { w: 320, h: 70, minVal: 0, maxVal: 1, refLine: 0.8, color: '#1e3a1e', dotColor: '#3a7a3a' });
+  html += svgLine(accVals, { w: 320, h: 70, minVal: 0, maxVal: 1, refLine: 0.8, color: '#1e3a1e', dotColor: '#3a7a3a', yFmt: v => Math.round(v * 100) + '%' });
 
   // Response time chart — ok and miss as separate lines
   const okTVals   = buckets.map(b => b.okMs.length   ? b.okMs.reduce((a, c) => a + c)   / b.okMs.length   / 1000 : null);
@@ -382,8 +390,8 @@ async function refreshTrends() {
   if (allTs.length >= 2) {
     const maxT = Math.max(...allTs);
     html += `<div class="ts-lbl">response time (s) · <span style="color:#3a7a3a">ok</span> <span style="color:#3c3c3c">/</span> <span style="color:#7a3a3a">miss</span></div>`;
-    if (okTVals.some(v => v !== null))   html += svgLine(okTVals,   { w: 320, h: 70, minVal: 0, maxVal: maxT, color: '#1e3a1e', dotColor: '#3a7a3a' });
-    if (missTVals.some(v => v !== null)) html += svgLine(missTVals, { w: 320, h: 70, minVal: 0, maxVal: maxT, color: '#3a1414', dotColor: '#7a3a3a' });
+    if (okTVals.some(v => v !== null))   html += svgLine(okTVals,   { w: 320, h: 70, minVal: 0, maxVal: maxT, color: '#1e3a1e', dotColor: '#3a7a3a', yFmt: v => v.toFixed(1) + 's' });
+    if (missTVals.some(v => v !== null)) html += svgLine(missTVals, { w: 320, h: 70, minVal: 0, maxVal: maxT, color: '#3a1414', dotColor: '#7a3a3a', yFmt: v => v.toFixed(1) + 's' });
   }
 
   // X-axis time labels (first + last + a few in between)
@@ -448,7 +456,7 @@ async function enterSessionDetail(sessionId, from) {
       return s.filter(a => a.hit).length / s.length;
     });
     html += `<div class="ts-lbl">rolling accuracy</div>`;
-    html += svgLine(cumAcc, { w: 320, h: 60, minVal: 0, maxVal: 1, refLine: 0.8, color: '#1e3a1e', dotColor: '#3a7a3a' });
+    html += svgLine(cumAcc, { w: 320, h: 60, minVal: 0, maxVal: 1, refLine: 0.8, color: '#1e3a1e', dotColor: '#3a7a3a', yFmt: v => Math.round(v * 100) + '%' });
   }
 
   // Kana breakdown, worst first

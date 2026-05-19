@@ -29,12 +29,18 @@ function renderLifetimeStats(attempts, sessions) {
 }
 
 function sessionRowHtml(s, atts) {
-  if (!atts.length) return '';
+  const dt   = new Date(s.startTs);
+  const date = dt.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+  const time = dt.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', timeZoneName:'short'});
+  if (!atts.length) {
+    return `<div class="hist-session-row" data-id="${s.id}">` +
+      `<span class="hist-sess-date"><span>${date}</span><small>${time}</small></span>` +
+      `<span class="hist-sess-acc" style="color:#3c3c3c">—</span>` +
+      `<span class="hist-sess-count" style="color:#3c3c3c">empty</span>` +
+      `<button class="hist-sess-del" title="Delete">✕</button></div>`;
+  }
   const ok    = atts.filter(a => a.hit).length;
   const pct   = Math.round(ok / atts.length * 100);
-  const dt    = new Date(s.startTs);
-  const date  = dt.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
-  const time  = dt.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit', timeZoneName:'short'});
   const color = pct >= 80 ? '#3a7a3a' : pct >= 60 ? '#6a5a20' : '#6a2a2a';
   const msTimes = atts.map(a => a.ms).filter(ms => ms > 0);
   const avgMs   = msTimes.length ? Math.round(msTimes.reduce((a, b) => a + b, 0) / msTimes.length) : 0;
@@ -57,9 +63,8 @@ function renderRecentSessions(sessions, attempts) {
 
   const sorted  = [...sessions].sort((a, b) => b.startTs - a.startTs);
   const lbl     = document.getElementById('hist-sessions-lbl');
-  lbl.innerHTML = sorted.length > 10
-    ? `recent sessions <span class="hist-see-all">see all ${sorted.length} →</span>`
-    : 'recent sessions';
+  const seeAll  = sorted.length > 10 ? `<span class="hist-see-all" id="hist-see-all-btn">see all ${sorted.length} →</span> ` : '';
+  lbl.innerHTML = `recent sessions ${seeAll}<span class="hist-see-all" id="btn-hist-trends">trends →</span>`;
   el.innerHTML  = sorted.slice(0, 10).map(s => sessionRowHtml(s, bySession[s.id] || [])).join('');
 }
 
@@ -152,7 +157,8 @@ document.getElementById('btn-hist-back').addEventListener('click', () => enterFl
 document.getElementById('btn-wk-back').addEventListener('click', () => enterHistory());
 document.getElementById('btn-sessions-back').addEventListener('click', () => enterHistory());
 document.getElementById('hist-sessions-lbl').addEventListener('click', e => {
-  if (e.target.closest('.hist-see-all')) enterAllSessions();
+  if (e.target.closest('#hist-see-all-btn')) enterAllSessions();
+  else if (e.target.closest('#btn-hist-trends')) enterTrends('history');
 });
 document.getElementById('hist-weakest-lbl').addEventListener('click', e => {
   if (e.target.closest('.hist-see-all')) enterWeakest();
@@ -201,4 +207,3 @@ function wireSessionList(el, from) {
 wireSessionList(document.getElementById('hist-sessions'), 'history');
 wireSessionList(document.getElementById('all-sessions-list'), 'sessions');
 
-document.getElementById('btn-hist-trends').addEventListener('click', () => enterTrends('history'));

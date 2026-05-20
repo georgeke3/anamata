@@ -32,7 +32,7 @@ h2 { font-size: .75rem; font-weight: 400; letter-spacing: .18em; color: #888; }
   font-size: .85rem;
   transition: border-color .12s, color .12s;
 }
-.btn:hover:not(:disabled):not(.toggle-btn) { border-color: #444; color: #bbb; }
+.btn:hover:not(:disabled):not(.toggle-btn):not(.trd-pill) { border-color: #444; color: #bbb; }
 .btn:active:not(:disabled) { opacity: .7; }
 .btn:disabled { opacity: .25; cursor: default; }
 .btn.go { border-color: #2a4a2a; color: #4caf50; }
@@ -323,11 +323,31 @@ rt { font-size: .42em; color: #555; user-select: none; -webkit-user-select: none
 #trd-filters { display: flex; flex-direction: column; gap: .35rem; width: 100%; }
 #trd-body    { width: 100%; display: flex; flex-direction: column; gap: 0; }
 .trd-filter-row { display: flex; gap: .3rem; flex-wrap: wrap; }
-.trd-pill     { font-size: .65rem; padding: .2rem .55rem; color: #3c3c3c; border-color: #1a1a1a; letter-spacing: .05em; }
-.trd-pill.on  { color: #888; border-color: #333; }
+.trd-pill          { font-size: .65rem; padding: .2rem .55rem; color: #3c3c3c; border-color: #1a1a1a; letter-spacing: .05em; }
+.trd-pill.on       { color: #ccc; border-color: #444; background: #141414; }
+.trd-pill:hover    { border-color: #252525; color: #555; }
+.trd-pill.on:hover { border-color: #555; color: #ddd; }
 .trd-pill-sm  { font-size: .58rem; padding: .15rem .38rem; }
 .trd-summary  { font-size: .82rem; color: #555; padding: .4rem 0 .1rem; }
 .trd-sum-t    { font-size: .7rem; color: #3c3c3c; margin-left: .3rem; }
+
+/* ── dot tooltip ─────────────────────────────────────────────────────────── */
+#ts-tip {
+  position: fixed;
+  background: #1c1c1c;
+  border: 1px solid #2a2a2a;
+  color: #999;
+  font-size: .65rem;
+  padding: .2rem .45rem;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .12s;
+  transform: translate(-50%, calc(-100% - 6px));
+  z-index: 20;
+  white-space: nowrap;
+}
+#ts-tip.visible { opacity: 1; }
 
 /* ── session detail screen ───────────────────────────────────────────────── */
 #s-session-detail { gap: .4rem; overflow-y: auto; padding: 1rem 1rem 3rem; width: 100%; max-width: 420px; box-sizing: border-box; align-items: flex-start; }

@@ -78,7 +78,9 @@ function svgLine(values, {w=320, h=65, color='#1e3a1e', dotColor, refLine, minVa
   const dots = values.map((v, i) => {
     if (v === null || isNaN(v)) return '';
     const [x, y] = coord(i, v);
-    return `<circle cx="${x}" cy="${y}" r="2.5" fill="${dotColor || color}"/>`;
+    const vis = `<circle cx="${x}" cy="${y}" r="2.5" fill="${dotColor || color}" pointer-events="none"/>`;
+    if (!yFmt) return vis;
+    return `<circle cx="${x}" cy="${y}" r="10" fill="transparent" pointer-events="all" class="ts-dot" data-tip="${yFmt(v)}"/>` + vis;
   }).join('');
 
   let ref = '';
@@ -490,6 +492,33 @@ async function enterSessionDetail(sessionId, from) {
 
   el.innerHTML = html;
 }
+
+// ── DOT TOOLTIP ───────────────────────────────────────────────────────────────
+
+const _tsTip = (() => {
+  const el = document.createElement('div');
+  el.id = 'ts-tip';
+  document.body.appendChild(el);
+  return el;
+})();
+
+let _tsTipTimer = null;
+
+document.addEventListener('click', e => {
+  const dot = e.target.closest('.ts-dot');
+  if (!dot) {
+    clearTimeout(_tsTipTimer);
+    _tsTip.classList.remove('visible');
+    return;
+  }
+  clearTimeout(_tsTipTimer);
+  const r = dot.getBoundingClientRect();
+  _tsTip.textContent = dot.dataset.tip;
+  _tsTip.style.left  = (r.left + r.width / 2) + 'px';
+  _tsTip.style.top   = r.top + 'px';
+  _tsTip.classList.add('visible');
+  _tsTipTimer = setTimeout(() => _tsTip.classList.remove('visible'), 2000);
+});
 
 // ── WIRE UP ───────────────────────────────────────────────────────────────────
 

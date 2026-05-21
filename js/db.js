@@ -115,6 +115,38 @@ async function loadAllAttempts() {
   } catch { return []; }
 }
 
+async function loadAllPrefs() {
+  try {
+    const db = await histDb();
+    return new Promise((res, rej) => {
+      const tx      = db.transaction('prefs', 'readonly');
+      const entries = [];
+      const req     = tx.objectStore('prefs').openCursor();
+      req.onsuccess = e => {
+        const cur = e.target.result;
+        if (cur) { entries.push({key: cur.key, value: cur.value}); cur.continue(); }
+        else res(entries);
+      };
+      req.onerror = e => rej(e.target.error);
+    });
+  } catch { return []; }
+}
+
+async function restoreDb({sessions = [], attempts = [], prefs = []}) {
+  const db = await histDb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(['sessions', 'attempts', 'prefs'], 'readwrite');
+    tx.objectStore('sessions').clear();
+    tx.objectStore('attempts').clear();
+    tx.objectStore('prefs').clear();
+    for (const s of sessions) tx.objectStore('sessions').put(s);
+    for (const a of attempts) tx.objectStore('attempts').put(a);
+    for (const p of prefs)    tx.objectStore('prefs').put(p.value, p.key);
+    tx.oncomplete = res;
+    tx.onerror    = e => rej(e.target.error);
+  });
+}
+
 async function loadAllSessions() {
   try {
     const db = await histDb();

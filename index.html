@@ -77,6 +77,13 @@
   </div>
   <div class="hist-section-lbl">fonts</div>
   <div id="fl-font-grid"></div>
+  <div class="hist-section-lbl">data</div>
+  <div style="display:flex;gap:.5rem;width:100%">
+    <button class="btn" id="btn-export" style="font-size:.7rem;flex:1">export</button>
+    <label class="btn" for="inp-import" style="font-size:.7rem;flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer">import</label>
+    <input type="file" id="inp-import" accept=".json" style="display:none">
+  </div>
+  <div id="backup-status" style="font-size:.65rem;color:#555;min-height:1.2em;text-align:center;width:100%"></div>
   <button class="btn" id="btn-fl-settings-back" data-swipe-back style="font-size:.7rem;color:#333;border-color:#1a1a1a;padding:.3rem .8rem">← back</button>
 </section>
 

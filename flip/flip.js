@@ -652,4 +652,82 @@ $('btn-fls-history').addEventListener('click', () => enterHistory('flip'));
 
 window.enterFlipHome = enterFlipHome;
 
+// ── BACKUP / RESTORE ──────────────────────────────────────────────────────────
+
+async function exportBackup() {
+  const [sessions, attempts, prefs] = await Promise.all([
+    loadAllSessions(), loadAllAttempts(), loadAllPrefs(),
+  ]);
+  const data = {
+    version: 1,
+    exportedAt: Date.now(),
+    localStorage: {
+      'flip-settings': JSON.parse(localStorage.getItem('flip-settings') || 'null'),
+    },
+    indexedDB: { sessions, attempts, prefs },
+  };
+  const blob     = new Blob([JSON.stringify(data)], {type: 'application/json'});
+  const filename = 'flip-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+  const file     = new File([blob], filename, {type: 'application/json'});
+  if (navigator.canShare?.({files: [file]})) {
+    await navigator.share({files: [file], title: 'Flip backup'});
+    return;
+  }
+  const url = URL.createObjectURL(blob);
+  const a   = Object.assign(document.createElement('a'), {href: url, download: filename});
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function importBackup(data) {
+  for (const [k, v] of Object.entries(data.localStorage || {})) {
+    if (v !== null) localStorage.setItem(k, JSON.stringify(v));
+  }
+  await restoreDb(data.indexedDB || {});
+}
+
+let _importData = null;
+
+$('btn-export').addEventListener('click', async () => {
+  const st = $('backup-status');
+  st.textContent = 'exporting…';
+  try {
+    await exportBackup();
+    st.textContent = 'exported ✓';
+  } catch (e) {
+    st.textContent = e.name === 'AbortError' ? '' : 'export failed';
+  }
+  setTimeout(() => { st.textContent = ''; }, 3000);
+});
+
+$('inp-import').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const st = $('backup-status');
+  try {
+    _importData = JSON.parse(await file.text());
+    if (!_importData.version || !_importData.indexedDB) throw new Error('invalid file');
+    const ns = _importData.indexedDB.sessions?.length ?? 0;
+    const na = _importData.indexedDB.attempts?.length ?? 0;
+    st.innerHTML = `${ns} sessions · ${na} attempts &nbsp;<button id="btn-import-confirm" class="btn" style="font-size:.62rem;color:#9a3a3a;border-color:#3a1414;padding:.15rem .5rem">replace →</button>`;
+    $('btn-import-confirm').addEventListener('click', async () => {
+      st.textContent = 'importing…';
+      try {
+        await importBackup(_importData);
+        loadFlipSettings();
+        st.textContent = 'done ✓';
+      } catch (err) {
+        st.textContent = 'failed: ' + err.message;
+      }
+      _importData = null;
+      e.target.value = '';
+      setTimeout(() => { st.textContent = ''; }, 4000);
+    });
+  } catch {
+    st.textContent = 'could not read file';
+    _importData = null;
+    e.target.value = '';
+  }
+});
+
 })();

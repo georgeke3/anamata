@@ -253,9 +253,12 @@ async function kdLoadStats(char) {
 
 let trdScript = new Set(['hira', 'kata']);
 let trdKind   = new Set(['base', 'dakuten', 'combo']);
-let trdRows   = null;   // null = all base rows; otherwise Set of row IDs
+let trdRows   = null;   // null = all; Set = specific rows (empty Set = none)
 let trdRange  = 'M';
 let trdFrom   = 'history';
+
+// Button references kept for in-place class updates (no DOM rebuild on toggle)
+const _trdB = { script: {}, kind: {}, row: {}, range: {}, all: null, rowRow: null };
 
 async function enterTrends(from) {
   trdFrom = from || 'history';
@@ -265,79 +268,94 @@ async function enterTrends(from) {
 }
 
 function renderTrdFilters() {
-  const f = document.getElementById('trd-filters');
+  const f    = document.getElementById('trd-filters');
+  const ids  = ['a','ka','sa','ta','na','ha','ma','ya','ra','wa'];
   f.innerHTML = '';
 
-  function pillRow(pairs, activeSet, onToggle) {
-    const row = document.createElement('div');
-    row.className = 'trd-filter-row';
-    for (const [val, lbl] of pairs) {
-      const btn = document.createElement('button');
-      btn.className = 'btn trd-pill' + (activeSet.has(val) ? ' on' : '');
-      btn.textContent = lbl;
-      btn.addEventListener('click', () => onToggle(val, activeSet, btn));
-      row.appendChild(btn);
-    }
-    f.appendChild(row);
+  // Script row
+  const scriptRow = document.createElement('div');
+  scriptRow.className = 'trd-filter-row';
+  for (const [val, lbl] of [['hira', 'あ hira'], ['kata', 'ア kata']]) {
+    const btn = document.createElement('button');
+    btn.className = 'btn trd-pill' + (trdScript.has(val) ? ' on' : '');
+    btn.textContent = lbl;
+    btn.addEventListener('click', () => {
+      if (trdScript.has(val)) { if (trdScript.size > 1) trdScript.delete(val); } else trdScript.add(val);
+      updateTrdFilters(); refreshTrends();
+    });
+    _trdB.script[val] = btn;
+    scriptRow.appendChild(btn);
   }
+  f.appendChild(scriptRow);
 
-  function toggle(val, set, btn) {
-    if (set.has(val)) {
-      if (set.size > 1) set.delete(val);
-    } else {
-      set.add(val);
-    }
-    renderTrdFilters();
-    refreshTrends();
+  // Kind row
+  const kindRow = document.createElement('div');
+  kindRow.className = 'trd-filter-row';
+  for (const [val, lbl] of [['base', 'base'], ['dakuten', 'dakuten'], ['combo', 'combos']]) {
+    const btn = document.createElement('button');
+    btn.className = 'btn trd-pill' + (trdKind.has(val) ? ' on' : '');
+    btn.textContent = lbl;
+    btn.addEventListener('click', () => {
+      if (trdKind.has(val)) { if (trdKind.size > 1) trdKind.delete(val); } else trdKind.add(val);
+      updateTrdFilters(); refreshTrends();
+    });
+    _trdB.kind[val] = btn;
+    kindRow.appendChild(btn);
   }
+  f.appendChild(kindRow);
 
-  pillRow([['hira', 'あ hira'], ['kata', 'ア kata']], trdScript, toggle);
-  pillRow([['base', 'base'], ['dakuten', 'dakuten'], ['combo', 'combos']], trdKind, toggle);
+  // Base row sub-filter (shown/hidden via display, never rebuilt)
+  const rowRow = document.createElement('div');
+  rowRow.className = 'trd-filter-row';
+  rowRow.style.display = trdKind.has('base') ? '' : 'none';
+  _trdB.rowRow = rowRow;
 
-  // Base row sub-filters (only when base kind is active)
-  if (trdKind.has('base')) {
-    const ids    = ['a','ka','sa','ta','na','ha','ma','ya','ra','wa'];
-    const rowRow = document.createElement('div');
-    rowRow.className = 'trd-filter-row';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'btn trd-pill trd-pill-sm' + (trdRows === null ? ' on' : '');
+  allBtn.textContent = 'all';
+  allBtn.addEventListener('click', () => {
+    trdRows = trdRows === null ? new Set() : null;
+    updateTrdFilters(); refreshTrends();
+  });
+  _trdB.all = allBtn;
+  rowRow.appendChild(allBtn);
 
-    const allBtn = document.createElement('button');
-    allBtn.className = 'btn trd-pill trd-pill-sm' + (trdRows === null ? ' on' : '');
-    allBtn.textContent = 'all';
-    allBtn.addEventListener('click', () => { trdRows = null; renderTrdFilters(); refreshTrends(); });
-    rowRow.appendChild(allBtn);
-
-    for (const id of ids) {
-      const sel = trdRows === null || trdRows.has(id);
-      const btn = document.createElement('button');
-      btn.className = 'btn trd-pill trd-pill-sm' + (sel ? ' on' : '');
-      btn.textContent = id;
-      btn.addEventListener('click', () => {
-        if (trdRows === null) trdRows = new Set(ids);
-        if (trdRows.has(id)) {
-          if (trdRows.size > 1) trdRows.delete(id);
-        } else {
-          trdRows.add(id);
-          if (trdRows.size === ids.length) trdRows = null;
-        }
-        renderTrdFilters();
-        refreshTrends();
-      });
-      rowRow.appendChild(btn);
-    }
-    f.appendChild(rowRow);
+  for (const id of ids) {
+    const btn = document.createElement('button');
+    btn.className = 'btn trd-pill trd-pill-sm' + (trdRows === null || trdRows.has(id) ? ' on' : '');
+    btn.textContent = id;
+    btn.addEventListener('click', () => {
+      if (trdRows === null) trdRows = new Set(ids);
+      if (trdRows.has(id)) { if (trdRows.size > 1) trdRows.delete(id); }
+      else { trdRows.add(id); if (trdRows.size === ids.length) trdRows = null; }
+      updateTrdFilters(); refreshTrends();
+    });
+    _trdB.row[id] = btn;
+    rowRow.appendChild(btn);
   }
+  f.appendChild(rowRow);
 
-  // Time range
+  // Range row
   const rangeRow = document.createElement('div');
   rangeRow.className = 'trd-filter-row';
   for (const r of ['W', 'M', 'Y', 'ALL']) {
     const btn = document.createElement('button');
     btn.className = 'btn trd-pill' + (trdRange === r ? ' on' : '');
     btn.textContent = r;
-    btn.addEventListener('click', () => { trdRange = r; renderTrdFilters(); refreshTrends(); });
+    btn.addEventListener('click', () => { trdRange = r; updateTrdFilters(); refreshTrends(); });
+    _trdB.range[r] = btn;
     rangeRow.appendChild(btn);
   }
   f.appendChild(rangeRow);
+}
+
+function updateTrdFilters() {
+  for (const [v, b] of Object.entries(_trdB.script)) b.classList.toggle('on', trdScript.has(v));
+  for (const [v, b] of Object.entries(_trdB.kind))   b.classList.toggle('on', trdKind.has(v));
+  if (_trdB.rowRow) _trdB.rowRow.style.display = trdKind.has('base') ? '' : 'none';
+  if (_trdB.all)    _trdB.all.classList.toggle('on', trdRows === null);
+  for (const [id, b] of Object.entries(_trdB.row))   b.classList.toggle('on', trdRows === null || trdRows.has(id));
+  for (const [r,  b] of Object.entries(_trdB.range)) b.classList.toggle('on', trdRange === r);
 }
 
 async function refreshTrends() {

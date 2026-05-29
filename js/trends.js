@@ -251,17 +251,19 @@ async function kdLoadStats(char) {
 
 // ── TRENDS SCREEN ─────────────────────────────────────────────────────────────
 
-let trdScript = new Set(['hira', 'kata']);
-let trdKind   = new Set(['base', 'dakuten', 'combo']);
-let trdRows   = null;   // null = all; Set = specific rows (empty Set = none)
-let trdRange  = 'M';
-let trdFrom   = 'history';
+let trdScript   = new Set(['hira', 'kata']);
+let trdKind     = new Set(['base', 'dakuten', 'combo']);
+let trdRows     = null;   // null = all; Set = specific rows (empty Set = none)
+let trdRange    = 'M';
+let trdFrom     = 'history';
+let _trdCache   = null;   // attempts cached for current screen visit
 
 // Button references kept for in-place class updates (no DOM rebuild on toggle)
 const _trdB = { script: {}, kind: {}, row: {}, range: {}, all: null, rowRow: null };
 
 async function enterTrends(from) {
-  trdFrom = from || 'history';
+  trdFrom  = from || 'history';
+  _trdCache = null;
   showScreen('trends');
   renderTrdFilters();
   await refreshTrends();
@@ -360,9 +362,13 @@ function updateTrdFilters() {
 
 async function refreshTrends() {
   const bodyEl = document.getElementById('trd-body');
-  bodyEl.innerHTML = '<div class="ts-empty">loading…</div>';
 
-  let attempts = (await loadAllAttempts()).filter(a => a.mode === 'flip');
+  if (!_trdCache) {
+    bodyEl.innerHTML = '<div class="ts-empty">loading…</div>';
+    _trdCache = (await loadAllAttempts()).filter(a => a.mode === 'flip');
+  }
+
+  let attempts = _trdCache.slice();
 
   attempts = attempts.filter(a => {
     if (!trdScript.has(charScript(a.kana)))  return false;
